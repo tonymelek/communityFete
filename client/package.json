@@ -1,13 +1,14 @@
 {
-  "name": "mern",
+  "name": "CommunityFete",
   "version": "0.1.0",
-  "description": "Mern Demo",
+  "description": "Vommunity Fete Front-End with React",
   "private": true,
   "proxy": "http://localhost:5000/",
   "dependencies": {
-    "react": "^16.6.3",
-    "react-dom": "^16.6.3",
-    "react-scripts": "^2.1.1"
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1",
+    "react-scripts": "4.0.1",
+    "web-vitals": "^0.2.4"
   },
   "scripts": {
     "start": "react-scripts start",
