@@ -8,6 +8,17 @@ module.exports = function (sequelize, DataTypes) {
             type: DataTypes.STRING,
             allowNull: false
         },
+        item_pic: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            validate: {
+                isOnGoogleDrive(value) {
+                    if (!(/https:\/\/drive.google.com\/file\/(.)+/g).test(value)) {
+                        throw new Error('Picture is not Stored on Google Drive')
+                    }
+                }
+            }
+        },
         unit: {
             type: DataTypes.STRING,
             allowNull: false
@@ -24,10 +35,6 @@ module.exports = function (sequelize, DataTypes) {
             type: DataTypes.BOOLEAN,
             allowNull: false,
             defaultValue: true
-        },
-        category: {
-            type: DataTypes.STRING,
-            allowNull: false
         }
 
     })

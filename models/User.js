@@ -7,6 +7,10 @@ module.exports = function (sequelize, DataTypes) {
                 isEmail: true
             }
         },
+        password: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
         balance: {
             type: DataTypes.FLOAT,
             allowNull: false,

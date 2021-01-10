@@ -1,20 +1,39 @@
-import React, { Component } from "react";
-import logo from "./logo.svg";
-import "./App.css";
+import React, { useReducer } from "react";
+import Login from "./components/Login";
+import AppContext from "./utils/AppContext";
+import { BrowserRouter, Switch, Route, Link } from "react-router-dom";
+import Admin from "./pages/Admin";
+import User from "./pages/User";
 
-function App() {
+export default function App() {
+  const initialState = { token: '', basket: [] };
+  const [state, dispatch] = useReducer((state, action) => {
+    switch (action.type) {
+      case "update_token":
+        return { ...state, token: action.token }
+      case "subtract":
+        return
+      default:
+        return state;
+    }
+  }, initialState);
   return (
-    <div className="App">
-      <div className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <h2>Welcome to React</h2>
+    <AppContext.Provider value={{ state, dispatch }}>
+      <div className="App container">
+        <BrowserRouter>
+          <Switch>
+            <Route path="/" exact>
+              <Login />
+            </Route>
+            <Route path="/admin" exact>
+              <Admin />
+            </Route>
+            <Route path="/user" exact>
+              <User />
+            </Route>
+          </Switch>
+        </BrowserRouter>
       </div>
-      <p className="App-intro">
-        To get started, edit <code>src/App.js</code> and save to reload.
-      </p>
-    </div>
+    </AppContext.Provider>
   );
 }
-
-
-export default App;

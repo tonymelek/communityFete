@@ -14,16 +14,8 @@ module.exports = function (sequelize, DataTypes) {
                 allowNull: false,
             },
         });
-        Transaction.belongsTo(models.Order, {
-            foreignKey: {
-                allowNull: false,
-            },
-        });
-        Transaction.belongsTo(models.Shop, {
-            foreignKey: {
-                allowNull: false,
-            },
-        });
+
+        Transaction.hasMany(models.Order)
     }
 
     return Transaction;

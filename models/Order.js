@@ -22,7 +22,11 @@ module.exports = function (sequelize, DataTypes) {
                 allowNull: false,
             },
         });
-        Order.hasMany(models.Shop)
+        Order.belongsTo(models.Transaction, {
+            foreignKey: {
+                allowNull: false,
+            },
+        });
     }
 
     return Order;

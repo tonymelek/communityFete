@@ -1,7 +1,7 @@
 const express = require("express");
 const http = require('http');
 const path = require("path");
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 5000;
 const app = express();
 const db = require('./models');
 
@@ -19,7 +19,8 @@ if (process.env.NODE_ENV === "production") {
   app.use(express.static("client/build"));
 }
 
-// Define API routes here
+//  API routes
+app.use('/api', require('./routes/api-routes'))
 
 // Send every other request to the React app
 // Define any API routes before this runs
