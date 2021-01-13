@@ -100,14 +100,24 @@ router.post('/signup', async (req, res) => {
 //Create Menu Item
 router.post('/create-menu-item', verifyToken, async (req, res) => {
     try {
+        console.log('I came here');
         const { token, authData } = req;
-        const { item_name, item_desc, item_pic, unit, serve, price, ShopId } = req.body;
+        console.log(req.body, authData);
+        const { item_name, item_desc, item_pic, unit, serve, price } = req.body;
         //use authData to let only merchant at the ShopId can add items
-        const user = db.findOne({ where: { email: authData.email, role: "merchant", ShopId: ShopId } })
-        console.log(user);
-        db.Menu.create({ item_name, item_desc, item_pic, unit, serve, price, ShopId })
-            .then(data => res.status(200).json({ msg: "menu item created successfully", token }))
-            .catch(err => res.status(403).json({ err: 'Failed to create new menu item', error_details: err.message }));
+        const user = await db.User.findOne({
+            where:
+            {
+                email: authData.email,
+                role: "merchant",
+            }
+        })
+        if (!user.dataValues) {
+            return res.status(403).send("You are noy authorized")
+        }
+        db.Menu.create({ item_name, item_desc, item_pic, unit, serve, price, ShopId: user.dataValues.ShopId })
+            .then(data => res.status(200).send("Item created successfully"))
+            .catch(err => { res.status(403).send("Creation failed", err) })
 
     }
     catch (err) {

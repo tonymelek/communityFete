@@ -13,7 +13,7 @@ module.exports = function (sequelize, DataTypes) {
             allowNull: false,
             validate: {
                 isOnGoogleDrive(value) {
-                    if (!(/https:\/\/drive.google.com\/file\/(.)+/g).test(value)) {
+                    if (!(/https:\/\/drive.google.com\/(.)+/g).test(value)) {
                         throw new Error('Picture is not Stored on Google Drive')
                     }
                 }
