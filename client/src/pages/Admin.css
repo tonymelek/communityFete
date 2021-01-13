@@ -1,0 +1,18 @@
+.container{max-width:900px;}
+
+.form-group{
+    margin-bottom: 10px;
+}
+.admin__user__topup{
+    min-width:3rem;
+}
+.notification{
+  width:300px;
+  height: 60px;
+  background-color: green;
+  color:white;
+  position: fixed;
+  top:0;
+  z-index:100;
+}
+

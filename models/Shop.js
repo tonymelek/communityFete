@@ -5,7 +5,8 @@ module.exports = function (sequelize, DataTypes) {
             allowNull: false,
             validate: {
                 len: [2, 15]
-            }
+            },
+            unique: true
         },
         balance: {
             type: DataTypes.FLOAT,

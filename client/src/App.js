@@ -4,15 +4,19 @@ import AppContext from "./utils/AppContext";
 import { BrowserRouter, Switch, Route, Link } from "react-router-dom";
 import Admin from "./pages/Admin";
 import User from "./pages/User";
+import NotFound from "./pages/NotFound";
+import Merchant from "./pages/Merchant";
 
 export default function App() {
-  const initialState = { token: '', basket: [] };
+  const initialState = { token: '', basket: [], role: '', balance: 0 };
   const [state, dispatch] = useReducer((state, action) => {
     switch (action.type) {
       case "update_token":
         return { ...state, token: action.token }
-      case "subtract":
-        return
+      case "update_balance":
+        return { ...state, balnace: action.balance }
+      case "update_role":
+        return { ...state, role: action.role }
       default:
         return state;
     }
@@ -25,11 +29,17 @@ export default function App() {
             <Route path="/" exact>
               <Login />
             </Route>
-            <Route path="/admin" exact>
+            <Route path="/admin" >
               <Admin />
             </Route>
-            <Route path="/user" exact>
+            <Route path="/user" >
               <User />
+            </Route>
+            <Route path="/merchant" >
+              <Merchant />
+            </Route>
+            <Route path="*">
+              <NotFound />
             </Route>
           </Switch>
         </BrowserRouter>

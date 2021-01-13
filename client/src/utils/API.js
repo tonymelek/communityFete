@@ -1,5 +1,4 @@
 import axios from 'axios'
-import { useHistory } from "react-router-dom";
 
 
 export default {
@@ -29,5 +28,42 @@ export default {
                 email: email.current.value, password: password.current.value
             }
         })
+    },
+    updateBalanceRole(updateObj, token) {
+        return axios({
+            method: 'put',
+            url: '/api/updateBalanceRole',
+            headers: {
+                authorization: `bearer ${token}`
+            },
+            data: updateObj
+        })
+    },
+    getShops() {
+        return axios({
+            method: 'get',
+            url: '/api/allshops'
+        })
+    },
+    createNewShop(updateObj, token) {
+        return axios({
+            method: 'post',
+            url: '/api/create-shop',
+            headers: {
+                authorization: `bearer ${token}`
+            },
+            data: updateObj
+        })
+    },
+    createMenuItem(updateObj, token) {
+        return axios({
+            method: 'post',
+            url: '/api/create-menu-item',
+            headers: {
+                authorization: `bearer ${token}`
+            },
+            data: updateObj
+        })
     }
+
 }

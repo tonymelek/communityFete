@@ -13,15 +13,18 @@ export default function Login() {
         e.preventDefault()
         API.login(email, password).then(res => {
             dispatch({ type: 'update_token', token: res.data.token })
+            dispatch({ type: 'update_balance', balance: res.data.balance })
+            dispatch({ type: 'update_role', role: res.data.role })
             history.push(`/${res.data.role}`)
         })
             .catch(err => console.warn(err.response.data))
     }
     const handleSignup = (e, email, password) => {
         e.preventDefault()
-
         API.signup(email, password).then(res => {
             dispatch({ type: 'update_token', token: res.data.token })
+            dispatch({ type: 'update_balance', balance: res.data.balance })
+            dispatch({ type: 'update_role', role: res.data.role })
             history.push(`/${res.data.role}`)
         })
             .catch(err => console.warn(err.response.data))
