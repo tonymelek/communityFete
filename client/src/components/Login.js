@@ -15,9 +15,12 @@ export default function Login() {
             dispatch({ type: 'update_token', token: res.data.token })
             dispatch({ type: 'update_balance', balance: res.data.balance })
             dispatch({ type: 'update_role', role: res.data.role })
+            dispatch({ type: 'update_email', email: res.data.email })
+            localStorage.setItem("conmmFete", res.data.token)
+            localStorage.setItem("conmmFete_role", res.data.role)
             history.push(`/${res.data.role}`)
         })
-            .catch(err => console.warn(err.response.data))
+            .catch(err => console.warn(err))
     }
     const handleSignup = (e, email, password) => {
         e.preventDefault()
@@ -25,9 +28,12 @@ export default function Login() {
             dispatch({ type: 'update_token', token: res.data.token })
             dispatch({ type: 'update_balance', balance: res.data.balance })
             dispatch({ type: 'update_role', role: res.data.role })
+            dispatch({ type: 'update_email', email: res.data.email })
+            localStorage.setItem("conmmFete", res.data.token)
+            localStorage.setItem("conmmFete_role", res.data.role)
             history.push(`/${res.data.role}`)
         })
-            .catch(err => console.warn(err.response.data))
+            .catch(err => console.warn(err))
     }
     return (
         <>

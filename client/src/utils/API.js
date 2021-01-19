@@ -43,6 +43,22 @@ export default {
         return axios({
             method: 'get',
             url: '/api/allshops'
+
+        })
+    },
+    getMenu(token) {
+        return axios({
+            method: 'get',
+            url: '/api/allmenu',
+            headers: {
+                authorization: `bearer ${token}`
+            }
+        })
+    },
+    getMenu_user() {
+        return axios({
+            method: 'get',
+            url: '/api/allmenu-users',
         })
     },
     createNewShop(updateObj, token) {
@@ -63,6 +79,15 @@ export default {
                 authorization: `bearer ${token}`
             },
             data: updateObj
+        })
+    },
+    getThisUser(token) {
+        return axios({
+            method: 'get',
+            url: '/api/get-this',
+            headers: {
+                authorization: `bearer ${token}`
+            }
         })
     }
 

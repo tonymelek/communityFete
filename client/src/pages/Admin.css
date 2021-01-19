@@ -9,10 +9,8 @@
 .notification{
   width:300px;
   min-height: 60px;
-  background-color: green;
   color:white;
   position: fixed;
   top:0;
   z-index:100;
 }
-

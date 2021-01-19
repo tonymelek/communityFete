@@ -8,15 +8,28 @@ export default function Admin() {
     const categories = ["Hot Food", "Beverage", "Kids", "Deserts"].sort()
     const history = useHistory();
     const [user, setUser] = useState('');
-    const [display, setDisplay] = useState({ class: 'd-none', color: '', text: '' })
     const [users, setUsers] = useState([])
     const [shops, setShops] = useState([])
     const [newshop, setNewshop] = useState({ name: '', category: categories[0] })
     const [searchText, setSearchText] = useState('')
     const { dispatch, state } = useContext(AppContext);
+    const display = state.display
+    useEffect(() => {
+        let tempToken = localStorage.getItem("conmmFete")
+        if (tempToken === null) {
+            history.replace(`/`)
+            return
+        }
+        API.getThisUser(tempToken).then(res => {
+            dispatch({ type: 'update_token', token: res.data.token })
+            dispatch({ type: 'update_balance', balance: res.data.balance })
+            dispatch({ type: 'update_role', role: res.data.role })
+            dispatch({ type: 'update_email', email: res.data.email })
+        })
+            .catch(err => console.warn(err))
 
+    }, [])
 
-    state.role !== "admin" ? history.replace(`/${state.role}`) : null
     const toBeUpdated = {}
     const update = (e, email, attr) => {
         const toUpdate = users.filter(user => user.email === email)[0];
@@ -45,51 +58,69 @@ export default function Admin() {
         API.updateBalanceRole(toBeUpdated[email], state.token)
             .then(res => {
                 setUser(res.data);
-                setDisplay({ class: 'd-block', color: 'bg-success', text: 'User Updated Successfully' })
-                setTimeout(() => setDisplay({ class: 'd-none', color: '', text: '' }), 2000)
+                dispatch({ type: 'notifier', display: { class: 'd-block', color: 'bg-success', text: 'User Updated Successfully' } })
+                setTimeout(() => {
+                    dispatch({ type: 'notifier', display: { class: 'd-none', color: '', text: '' } })
+                }, 2000);
+
 
             })
             .catch(err => {
-                setDisplay({ class: 'd-block', color: 'bg-danger', text: err.response })
-                setTimeout(() => setDisplay({ class: 'd-none', color: '', text: '' }), 2000)
+                dispatch({ type: 'notifier', display: { class: 'd-block', color: 'bg-danger', text: `${err.response}` } })
+                setTimeout(() => {
+                    dispatch({ type: 'notifier', display: { class: 'd-none', color: '', text: '' } })
+                }, 2000);
+
             })
     }
     const newShopCreator = () => {
         if (newshop.name.trim().length < 2) {
-            setDisplay({ class: 'd-block', color: 'bg-danger', text: `Shop name can't be empty` })
-            setTimeout(() => setDisplay({ class: 'd-none', color: '', text: '' }), 2000)
+            dispatch({ type: 'notifier', display: { class: 'd-block', color: 'bg-danger', text: `Shop name can't be empty` } })
+            setTimeout(() => {
+                dispatch({ type: 'notifier', display: { class: 'd-none', color: '', text: '' } })
+            }, 2000);
+
             return
         }
         API.createNewShop(newshop, state.token)
             .then(res => {
                 setNewshop({ name: '', category: categories[0] })
-                setDisplay({ class: 'd-block', color: 'bg-success', text: 'Shop created Successfully' })
-                setTimeout(() => setDisplay({ class: 'd-none', color: '', text: '' }), 2000)
+                dispatch({ type: 'notifier', display: { class: 'd-block', color: 'bg-success', text: 'Shop created Successfully' } })
+                setTimeout(() => {
+                    dispatch({ type: 'notifier', display: { class: 'd-none', color: '', text: '' } })
+                }, 2000);
             })
             .catch(err => {
-                setDisplay({ class: 'd-block', color: 'bg-danger', text: err.response })
-                setTimeout(() => setDisplay({ class: 'd-none', color: '', text: '' }), 2000)
+                dispatch({ type: 'notifier', display: { class: 'd-block', color: 'bg-danger', text: `${err.response}` } })
+                setTimeout(() => {
+                    dispatch({ type: 'notifier', display: { class: 'd-none', color: '', text: '' } })
+                }, 2000);
             })
     }
     useEffect(() => {
         API.getUsers(state.token)
             .then(res => setUsers(res.data))
             .catch(err => {
-                setDisplay({ class: 'd-block', color: 'bg-danger', text: err.response })
-                setTimeout(() => setDisplay({ class: 'd-none', color: '', text: '' }), 2000)
+                dispatch({ type: 'notifier', display: { class: 'd-block', color: 'bg-danger', text: `${err.response}` } })
+                setTimeout(() => {
+                    dispatch({ type: 'notifier', display: { class: 'd-none', color: '', text: '' } })
+                }, 2000);
             })
         API.getShops()
             .then(res => setShops(res.data))
             .catch(err => {
-                setDisplay({ class: 'd-block', color: 'bg-danger', text: err.response })
-                setTimeout(() => setDisplay({ class: 'd-none', color: '', text: '' }), 2000)
+                dispatch({ type: 'notifier', display: { class: 'd-block', color: 'bg-danger', text: `${err.response}` } })
+                setTimeout(() => {
+                    dispatch({ type: 'notifier', display: { class: 'd-none', color: '', text: '' } })
+                }, 2000);
             })
-
-
-    }, [display])
+        if (state.role !== "" && state.role !== "admin") {
+            history.replace(`/${state.role}`)
+        }
+    }, [display, state])
     return (
         <div className="container">
-            <Notifier display={display} />
+            <Notifier />
 
             <div className="row">
                 <div className="col-12 col-md-6 admin__users__container  d-flex flex-column mx-auto mt-3 p-2">
@@ -118,8 +149,8 @@ export default function Admin() {
                                     <div className="form-group d-flex justify-content-around p-2 flex-grow-1">
 
                                         <div>Shop </div>
-                                        <select defaultValue={user.ShopId} onChange={e => update(e, user.email, "shop")}>
-                                            {shops.map(shop => <option key={`shop-${shop.id}`} value={shop.id} >{shop.name}</option>)}
+                                        <select onChange={e => update(e, user.email, "shop")}>
+                                            {shops.map(shop => <option key={`shop-${shop.id}`} value={shop.id} selected={user.ShopId === shop.id}>{shop.name}</option>)}
                                         </select>
                                     </div> : null}
                                 {user.role === "user" ?

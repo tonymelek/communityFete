@@ -5,7 +5,7 @@ import Notifier from './Notifier'
 
 export default function CreateMenuItem() {
     const [display, setDisplay] = useState({ class: 'd-none', color: '', text: '' })
-    const [newItem, setNewItem] = useState({ item_name: '', item_desc: '', item_pic: '', unit: 'each', serve: 'sanswitch', price: 0 })
+    const [newItem, setNewItem] = useState({ item_name: '', item_desc: '', item_pic: '', unit: 'each', serve: 'sandwitch', price: 0 })
     const { dispatch, state } = useContext(AppContext);
     const createNewMenuItem = (e, updateObj) => {
         e.preventDefault();
@@ -18,6 +18,7 @@ export default function CreateMenuItem() {
         console.log(updateObj);
         API.createMenuItem(updateObj, state.token)
             .then(res => {
+                dispatch({ type: 'refreshAPI', refreshAPI: !state.refreshAPI })
                 setDisplay({ class: 'd-block', color: 'bg-success', text: 'Item created Successfully' })
                 setTimeout(() => setDisplay({ class: 'd-none', color: '', text: '' }), 2000)
             })

@@ -53,10 +53,11 @@ router.post('/login', async (req, res) => {
         if (user == null) {
             res.status(401).send(`${req.body.email} is not registered, please sign up`);
         }
+        console.log(user.dataValues);
         const result = await bcrypt.compare(req.body.password, user.dataValues.password)
         if (result) {
             const token = await jwtSign({ email: user.email, role: user.role }, '15m');
-            res.status(200).json({ token: token.token, role: user.role, balance: user.balance })
+            res.status(200).json({ token: token.token, role: user.dataValues.role, email: user.dataValues.email, balance: user.dataValues.balance })
             return
         } else {
             res.status(401).send("wrong email or password");
@@ -95,14 +96,27 @@ router.post('/signup', async (req, res) => {
         throw err;
     }
 });
-
+//Get user Data By Token to Handle Page Refresh 
+router.get('/get-this', verifyToken, async (req, res) => {
+    try {
+        const { token, authData } = req;
+        const user = await db.User.findOne({
+            where:
+            {
+                email: authData.email,
+            }
+        })
+        res.status(200).json({ token, role: user.dataValues.role, email: user.dataValues.email, balance: user.dataValues.balance })
+    }
+    catch (err) {
+        throw new Error(err)
+    }
+})
 
 //Create Menu Item
 router.post('/create-menu-item', verifyToken, async (req, res) => {
     try {
-        console.log('I came here');
         const { token, authData } = req;
-        console.log(req.body, authData);
         const { item_name, item_desc, item_pic, unit, serve, price } = req.body;
         //use authData to let only merchant at the ShopId can add items
         const user = await db.User.findOne({
@@ -173,6 +187,53 @@ router.get('/allshops', async (req, res) => {
         throw new Error(err)
     }
 })
+
+//Get all shops
+router.get('/allmenu-users', async (req, res) => {
+    try {
+        const menus = await db.Menu
+            .findAll({ include: [db.Shop] }
+            )
+        res.status(200).json(menus)
+    }
+    catch (err) {
+        throw new Error(err)
+    }
+})
+//Get all Menu Items for merchant
+router.get('/allmenu', verifyToken, async (req, res) => {
+    try {
+        const { authData } = req;
+        if (authData.role !== "merchant") {
+            return res.status(403).send("You are not authorized to update users data")
+        }
+        const user = await db.User.findOne({ where: { email: authData.email } })
+        console.log(user.dataValues);
+        const menus = await db.Menu.findAll({ where: { ShopId: user.dataValues.ShopId, availability: true } })
+        console.log(menus.dataValues);
+        res.status(200).json(menus)
+    }
+    catch (err) {
+        throw new Error(err)
+    }
+})
+
+//Process Payment and Create Order
+router.post('/processpayment', verifyToken, async (req, res) => {
+    try {
+        const { authData, body } = req;
+
+        const user = await db.User.findOne({ where: { email: authData.email } })
+        console.log(user.dataValues);
+        const transaction = await db.Transaction.create({ amount: body.total })
+        console.log(transaction.dataValues);
+        res.status(200).json(menus)
+    }
+    catch (err) {
+        throw new Error(err)
+    }
+})
+
 
 //export router
 module.exports = router
