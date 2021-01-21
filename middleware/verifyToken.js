@@ -19,7 +19,8 @@ const verifyToken = async (req, res, next) => {
             const newToken = jwtRefresh(token, '15m')
             token = newToken
             authData = await jwtVerify(token, secret);
-        } else {
+        }
+        else {
             throw err
         }
     }

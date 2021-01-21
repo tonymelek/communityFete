@@ -89,6 +89,16 @@ export default {
                 authorization: `bearer ${token}`
             }
         })
+    },
+    processPayment(updateObj, token) {
+        return axios({
+            method: 'post',
+            url: '/api/processpayment',
+            headers: {
+                authorization: `bearer ${token}`
+            },
+            data: updateObj
+        })
     }
 
 }

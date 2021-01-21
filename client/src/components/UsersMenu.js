@@ -22,7 +22,7 @@ export default function UsersMenu() {
             .catch(err => console.log(err.response))
 
     }, [state.refreshAPI])
-    const addToBasket = (e, item_id, item_name, price) => {
+    const addToBasket = (e, item_id, item_name, price, shopId) => {
         let qty = parseInt(e.target.value);
         if (qty <= 0) {
             e.target.value = 0
@@ -30,7 +30,7 @@ export default function UsersMenu() {
             delete updatedBasket[item_id]
         } else {
 
-            updatedBasket[item_id] = { qty, item_name, price }
+            updatedBasket[item_id] = { qty, item_name, price, shopId }
         }
         dispatch({ type: 'updateBasket', basket: updatedBasket })
     }
@@ -48,7 +48,7 @@ export default function UsersMenu() {
                         <p className="my-1"><strong>{item.item_name}</strong>-{item.serve}</p>
                         <p className="my-1">{item.item_desc}</p>
                         <p className="my-2">({item.unit}) ${item.price}</p>
-                        Qty<input type="number" onChange={e => addToBasket(e, item.id, item.item_name, item.price)} className="form-control w-50" />
+                        Qty<input type="number" onChange={e => addToBasket(e, item.id, item.item_name, item.price, item.ShopId)} className="form-control w-50" />
                     </div>
                     <div>
                         <img src={item.item_pic} width="100" alt={item.item_name} />

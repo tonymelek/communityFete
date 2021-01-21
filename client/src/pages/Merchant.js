@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react'
 import { useHistory } from 'react-router-dom';
 import CreateMenuItem from '../components/CreateMeuItem'
 import GetItems from '../components/GetItems'
+import ManageOrders from '../components/ManageOrders';
 import Notifier from '../components/Notifier';
 import API from '../utils/API';
 import AppContext from '../utils/AppContext';
@@ -35,7 +36,9 @@ export default function Merchant() {
         <div className="container">
             <Notifier />
             <div className="row">
-                <div className="col-md-6 col-12">View Orders</div>
+                <div className="col-md-6 col-12">View Orders
+                <ManageOrders />
+                </div>
 
                 <div className="col-md-6 col-12">Create Menu Item
             <CreateMenuItem />

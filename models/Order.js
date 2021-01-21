@@ -7,6 +7,11 @@ module.exports = function (sequelize, DataTypes) {
         order_items: {
             type: DataTypes.TEXT,
             allowNull: false,
+        },
+        order_status: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            defaultValue: 'paid'
         }
     })
     // Associate Users if merchants to Shops

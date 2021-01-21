@@ -8,6 +8,35 @@ const verifyToken = require('../middleware/verifyToken');
 const isStrong = require('../middleware/checkpassstrength');
 
 
+const userSockets = {}
+//Test IO
+io.on("connection", socket => {
+    console.log(`Socket Connection Established ${socket.id}`);
+    socket.on("userId", async data => {
+        if (data !== undefined) {
+            const user = await db.User.findOne({ where: { email: data } })
+            if (user.dataValues.ShopId !== null) {
+                let ShopId = user.dataValues.ShopId.toString()
+                socket.join(ShopId)
+                io.to(ShopId).emit('shopConnection', `You are now connected as Shop-${ShopId}`)
+            } else {
+                userSockets[user.dataValues.id] = socket.id
+            }
+        }
+    })
+    socket.on('newOrder', data => {
+        console.log('newOrder', data);
+        for (key in data) {
+            if (key !== 'transaction') {
+                io.to(key).emit('orderToShop', data[key])
+            }
+        }
+    })
+})
+
+
+
+
 //Create new Shop
 router.post('/create-shop', verifyToken, async (req, res) => {
     const { authData } = req;
@@ -84,9 +113,9 @@ router.post('/signup', async (req, res) => {
         else {
             const hashedPass = await bcrypt.hash(req.body.password, 10)
             if (!isStrong(req.body.password)) {
-                return res.status(403).json("Password should be 8-30 characters, a mix of letters and numbers and with no space")
+                return res.status(403).send("Password should be 8-30 characters, a mix of letters and numbers and with no space")
             }
-            const token = await jwtSign({ email: req.body.email, role: req.body.password }, '15m');
+            const token = await jwtSign({ email: req.body.email, role: "user" }, '15m');
             db.User.create({ email: req.body.email, password: hashedPass, role: "user" })
                 .then(data => res.status(200).json({ token: token.token, role: "user", balance: 0 }))
                 .catch(err => res.status(403).json({ err: 'Failed to create new user', error_details: err.message }));
@@ -142,6 +171,7 @@ router.post('/create-menu-item', verifyToken, async (req, res) => {
 //Get All users and merchants for admin
 router.get('/users', verifyToken, async (req, res) => {
     try {
+
         const { token, authData } = req;
         if (authData.role !== "admin") {
             res.status(403).send("Not Authorized to access this end point")
@@ -222,12 +252,40 @@ router.get('/allmenu', verifyToken, async (req, res) => {
 router.post('/processpayment', verifyToken, async (req, res) => {
     try {
         const { authData, body } = req;
-
+        console.log(body.total, authData);
+        const response = {};
+        if (body.total < 1 || authData.role !== "user") {
+            return res.status(403).send("Unauthorized Payment")
+        }
+        //Deduct from User account and update his balance
+        await db.User.update({
+            balance: db.sequelize.literal(`balance-${body.total}`)
+        }, { where: { email: authData.email } })
         const user = await db.User.findOne({ where: { email: authData.email } })
         console.log(user.dataValues);
-        const transaction = await db.Transaction.create({ amount: body.total })
-        console.log(transaction.dataValues);
-        res.status(200).json(menus)
+        //Record Transaction in transactions table
+        const transaction = await db.Transaction.create({ UserId: user.dataValues.id, amount: body.total });
+        console.log((transaction.dataValues));
+        response.transaction = transaction.dataValues;
+        const orders = JSON.parse(body.orders);
+        console.log(body);
+        const subTotal = body.subTotal
+
+        for (shop in orders) {
+            const tempOrder = await db.Order.create({ order_custom_id: `${transaction.dataValues.id}${shop}`, order_items: JSON.stringify(orders[shop]), ShopId: parseInt(shop), UserId: user.dataValues.id, TransactionId: transaction.dataValues.id })
+            response[shop] = tempOrder.dataValues;
+            response[shop]["email"] = authData.email;
+            response[shop]["total"] = subTotal[shop];
+            //add value to shop balance
+            await db.Shop.update({
+                balance: db.sequelize.literal(`balance+${subTotal[shop]}`)
+            },
+                {
+                    where: { id: parseInt(shop) }
+                })
+        }
+        console.log(response);
+        res.status(200).json(response)
     }
     catch (err) {
         throw new Error(err)

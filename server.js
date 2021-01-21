@@ -9,7 +9,7 @@ const server = http.createServer(app)
 
 //Socket IO
 const socketio = require('socket.io')
-const io = socketio(server);
+global.io = socketio(server);
 
 // Define middleware here
 app.use(express.urlencoded({ extended: true }));

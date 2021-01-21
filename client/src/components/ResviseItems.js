@@ -1,18 +1,40 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
+import API from '../utils/API';
 import AppContext from '../utils/AppContext'
 import './ReviseItems.css'
 
 export default function ResviseItems() {
     const { state, dispatch } = useContext(AppContext)
     const basket = [];
+    const order = {}
+    let subTotal = {}
     for (let item in state.basket) {
         state.basket[item]["id"] = item
         basket.push(state.basket[item])
+
+        if (order[state.basket[item].shopId]) {
+            order[state.basket[item].shopId].push({ id: state.basket[item].id, qty: state.basket[item].qty })
+            subTotal[state.basket[item].shopId] += state.basket[item].qty * state.basket[item].price
+        } else {
+            order[state.basket[item].shopId] = [{ id: state.basket[item].id, qty: state.basket[item].qty }]
+            subTotal[state.basket[item].shopId] = state.basket[item].qty * state.basket[item].price
+        }
     }
+    console.log(order, subTotal);
     const handleSetOrders = (e) => {
         e.preventDefault();
+
         if (state.balance >= state.orderTotal) {
             //call api to store transaction , update user balance , create orders in the database
+            API.processPayment({ orders: JSON.stringify(order), subTotal, total: state.orderTotal }, state.token)
+                .then(res => {
+                    console.log(res.data)
+                    const socket = io();
+                    socket.emit("userId", state.user_email)
+                    socket.emit('newOrder', res.data)
+                })
+                .catch(err => console.log(err.response))
+
             dispatch({ type: 'notifier', display: { class: 'd-block', color: 'bg-success', text: 'YESSS' } })
             setTimeout(() => {
                 dispatch({ type: 'notifier', display: { class: 'd-none', color: '', text: '' } })

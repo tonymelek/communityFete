@@ -17,10 +17,9 @@ export default function Login() {
             dispatch({ type: 'update_role', role: res.data.role })
             dispatch({ type: 'update_email', email: res.data.email })
             localStorage.setItem("conmmFete", res.data.token)
-            localStorage.setItem("conmmFete_role", res.data.role)
             history.push(`/${res.data.role}`)
         })
-            .catch(err => console.warn(err))
+            .catch(err => console.warn(err.response.data))
     }
     const handleSignup = (e, email, password) => {
         e.preventDefault()
@@ -30,10 +29,9 @@ export default function Login() {
             dispatch({ type: 'update_role', role: res.data.role })
             dispatch({ type: 'update_email', email: res.data.email })
             localStorage.setItem("conmmFete", res.data.token)
-            localStorage.setItem("conmmFete_role", res.data.role)
             history.push(`/${res.data.role}`)
         })
-            .catch(err => console.warn(err))
+            .catch(err => console.warn(err.response.data))
     }
     return (
         <>

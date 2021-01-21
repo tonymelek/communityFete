@@ -5,6 +5,11 @@ import { useHistory } from "react-router-dom";
 import './Admin.css'
 import Notifier from '../components/Notifier';
 export default function Admin() {
+    useEffect(() => {
+        const socket = io();
+    }, [])
+
+
     const categories = ["Hot Food", "Beverage", "Kids", "Deserts"].sort()
     const history = useHistory();
     const [user, setUser] = useState('');
@@ -33,6 +38,7 @@ export default function Admin() {
     const toBeUpdated = {}
     const update = (e, email, attr) => {
         const toUpdate = users.filter(user => user.email === email)[0];
+        console.log(toUpdate);
         switch (attr) {
             case "role":
                 toUpdate.role = e.target.value
@@ -50,6 +56,7 @@ export default function Admin() {
     }
     const handleUpdate = (e, email) => {
         console.log(toBeUpdated[email]);
+
         e.preventDefault();
         if (!toBeUpdated[email]) {
             return
@@ -98,14 +105,16 @@ export default function Admin() {
             })
     }
     useEffect(() => {
-        API.getUsers(state.token)
-            .then(res => setUsers(res.data))
-            .catch(err => {
-                dispatch({ type: 'notifier', display: { class: 'd-block', color: 'bg-danger', text: `${err.response}` } })
-                setTimeout(() => {
-                    dispatch({ type: 'notifier', display: { class: 'd-none', color: '', text: '' } })
-                }, 2000);
-            })
+        if (state.token !== "") {
+            API.getUsers(state.token)
+                .then(res => setUsers(res.data))
+                .catch(err => {
+                    dispatch({ type: 'notifier', display: { class: 'd-block', color: 'bg-danger', text: `${err.response}` } })
+                    setTimeout(() => {
+                        dispatch({ type: 'notifier', display: { class: 'd-none', color: '', text: '' } })
+                    }, 2000);
+                })
+        }
         API.getShops()
             .then(res => setShops(res.data))
             .catch(err => {
@@ -150,6 +159,7 @@ export default function Admin() {
 
                                         <div>Shop </div>
                                         <select onChange={e => update(e, user.email, "shop")}>
+                                            <option value=""></option>
                                             {shops.map(shop => <option key={`shop-${shop.id}`} value={shop.id} selected={user.ShopId === shop.id}>{shop.name}</option>)}
                                         </select>
                                     </div> : null}
