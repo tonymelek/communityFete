@@ -1,10 +1,13 @@
 import React, { useContext, useEffect } from 'react'
+import { useHistory } from 'react-router-dom';
 import API from '../utils/API';
 import AppContext from '../utils/AppContext'
 import './ReviseItems.css'
+import socketIOClient from "socket.io-client";
 
 export default function ResviseItems() {
     const { state, dispatch } = useContext(AppContext)
+    const history = useHistory();
     const basket = [];
     const order = {}
     let subTotal = {}
@@ -23,21 +26,21 @@ export default function ResviseItems() {
     console.log(order, subTotal);
     const handleSetOrders = (e) => {
         e.preventDefault();
-
+        const socket = socketIOClient()
         if (state.balance >= state.orderTotal) {
             //call api to store transaction , update user balance , create orders in the database
             API.processPayment({ orders: JSON.stringify(order), subTotal, total: state.orderTotal }, state.token)
                 .then(res => {
                     console.log(res.data)
-                    const socket = io();
-                    socket.emit("userId", state.user_email)
                     socket.emit('newOrder', res.data)
+                    socket.disconnect();
                 })
                 .catch(err => console.log(err.response))
 
-            dispatch({ type: 'notifier', display: { class: 'd-block', color: 'bg-success', text: 'YESSS' } })
+            dispatch({ type: 'notifier', display: { class: 'd-block', color: 'bg-success', text: 'Order Processed Successfully' } })
             setTimeout(() => {
                 dispatch({ type: 'notifier', display: { class: 'd-none', color: '', text: '' } })
+                history.replace('/order-tracker')
             }, 2000);
         } else {
             dispatch({ type: 'notifier', display: { class: 'd-block', color: 'bg-danger', text: 'Your Balance is insufficient' } })

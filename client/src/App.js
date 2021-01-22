@@ -7,8 +7,14 @@ import User from "./pages/User";
 import NotFound from "./pages/NotFound";
 import Merchant from "./pages/Merchant";
 import Checkout from "./pages/Checkout";
+import OrderTracker from "./pages/OrderTacker";
+// import Test from "./pages/Test";
+
 
 export default function App() {
+
+
+
   const initialState = { token: '', user_email: '', basket: {}, role: '', orderTotal: 0, balance: 0, refreshAPI: true, display: { class: 'd-none', color: '', text: '' } };
   const [state, dispatch] = useReducer((state, action) => {
     switch (action.type) {
@@ -49,9 +55,13 @@ export default function App() {
             <Route path="/checkout">
               <Checkout />
             </Route>
+            <Route path="/order-tracker">
+              <OrderTracker />
+            </Route>
             <Route path="/merchant" >
               <Merchant />
             </Route>
+
             <Route path="*">
               <NotFound />
             </Route>

@@ -12,6 +12,10 @@ module.exports = function (sequelize, DataTypes) {
             type: DataTypes.STRING,
             allowNull: false,
             defaultValue: 'paid'
+        },
+        order_total: {
+            type: DataTypes.FLOAT,
+            allowNull: false
         }
     })
     // Associate Users if merchants to Shops

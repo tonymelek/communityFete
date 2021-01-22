@@ -16,7 +16,7 @@ const verifyToken = async (req, res, next) => {
     }
     catch (err) {
         if (err.name === 'TokenExpiredError') {
-            const newToken = jwtRefresh(token, '15m')
+            const newToken = jwtRefresh(token, '59m')
             token = newToken
             authData = await jwtVerify(token, secret);
         }

@@ -4,9 +4,16 @@ import AppContext from '../utils/AppContext';
 import { useHistory } from "react-router-dom";
 import './Admin.css'
 import Notifier from '../components/Notifier';
+import io from "socket.io-client";
 export default function Admin() {
     useEffect(() => {
         const socket = io();
+        console.log('connected');
+        socket.emit('message', "App")
+        socket.on('id', data => console.log(data))
+        return () => {
+            socket.disconnect()
+        }
     }, [])
 
 
@@ -38,7 +45,7 @@ export default function Admin() {
     const toBeUpdated = {}
     const update = (e, email, attr) => {
         const toUpdate = users.filter(user => user.email === email)[0];
-        console.log(toUpdate);
+
         switch (attr) {
             case "role":
                 toUpdate.role = e.target.value
@@ -55,7 +62,7 @@ export default function Admin() {
         toBeUpdated[email] = toUpdate;
     }
     const handleUpdate = (e, email) => {
-        console.log(toBeUpdated[email]);
+
 
         e.preventDefault();
         if (!toBeUpdated[email]) {

@@ -4,32 +4,35 @@ import AppContext from '../utils/AppContext';
 import Notifier from './Notifier'
 
 export default function CreateMenuItem() {
-    const [display, setDisplay] = useState({ class: 'd-none', color: '', text: '' })
+
     const [newItem, setNewItem] = useState({ item_name: '', item_desc: '', item_pic: '', unit: 'each', serve: 'sandwitch', price: 0 })
     const { dispatch, state } = useContext(AppContext);
     const createNewMenuItem = (e, updateObj) => {
         e.preventDefault();
         const { item_name, item_desc, item_pic, unit, serve, price } = updateObj
         if (item_name.length < 2 || item_desc.length < 2 || item_pic.length < 2 || price <= 0) {
-            setDisplay({ class: 'd-block', color: 'bg-danger', text: `All Fields are Mandatory, please fill and re-submit` })
-            setTimeout(() => setDisplay({ class: 'd-none', color: '', text: '' }), 2000)
+            dispatch({ type: 'notifier', display: { class: 'd-block', color: 'bg-danger', text: `All Fields are Mandatory, please fill and re-submit` } })
+            setTimeout(() => {
+                dispatch({ type: 'notifier', display: { class: 'd-none', color: '', text: '' } })
+            }, 2000);
             return
         }
-        console.log(updateObj);
         API.createMenuItem(updateObj, state.token)
             .then(res => {
-                dispatch({ type: 'refreshAPI', refreshAPI: !state.refreshAPI })
-                setDisplay({ class: 'd-block', color: 'bg-success', text: 'Item created Successfully' })
-                setTimeout(() => setDisplay({ class: 'd-none', color: '', text: '' }), 2000)
+                dispatch({ type: 'notifier', display: { class: 'd-block', color: 'bg-success', text: 'Item created Successfully' } })
+                setTimeout(() => {
+                    dispatch({ type: 'notifier', display: { class: 'd-none', color: '', text: '' } })
+                }, 2000);
             })
             .catch(err => {
-                setDisplay({ class: 'd-block', color: 'bg-danger', text: `${err.response}` })
-                setTimeout(() => setDisplay({ class: 'd-none', color: '', text: '' }), 2000)
+                dispatch({ type: 'notifier', display: { class: 'd-block', color: 'bg-danger', text: `Error creating new Item` } })
+                setTimeout(() => {
+                    dispatch({ type: 'notifier', display: { class: 'd-none', color: '', text: '' } })
+                }, 2000);
             })
     }
     return (
         <div className="create_menu_item">
-            <Notifier display={display} />
             <div className="card p-3">
                 <div className="form-group">
                     <label htmlFor="create_menu_name">Item Name</label>

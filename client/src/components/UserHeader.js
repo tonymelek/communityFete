@@ -22,7 +22,7 @@ export default function UserHeader() {
 
     return (
         <div className="sticky-top bg-dark text-light p-2 text-center">
-            {JSON.stringify(state)}
+            {/* {JSON.stringify(state)} */}
             <p>Hi {state.user_email}</p>
             <p>Balance :${state.balance}</p>
             <p>Items : {Object.keys(state.basket).length}</p>

@@ -81,6 +81,19 @@ export default {
             data: updateObj
         })
     },
+
+    deleteMenuItem(updateObj, token) {
+        return axios({
+            method: 'delete',
+            url: '/api/delete-menu-item',
+            headers: {
+                authorization: `bearer ${token}`
+            },
+            data: updateObj
+        })
+    },
+
+
     getThisUser(token) {
         return axios({
             method: 'get',
@@ -99,6 +112,25 @@ export default {
             },
             data: updateObj
         })
+    },
+    getActiveOrders(token) {
+        return axios({
+            method: 'get',
+            url: '/api/activeorders',
+            headers: {
+                authorization: `bearer ${token}`
+            }
+        })
+    },
+    getUserActiveOrders(token) {
+        return axios({
+            method: 'get',
+            url: '/api/myactiveorders',
+            headers: {
+                authorization: `bearer ${token}`
+            }
+        })
     }
+
 
 }

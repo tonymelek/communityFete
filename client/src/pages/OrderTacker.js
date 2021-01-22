@@ -1,15 +1,18 @@
 import React, { useContext, useEffect } from 'react'
-import { useHistory } from 'react-router-dom';
+import MyOrders from '../components/MyOrders'
+import Notifier from '../components/Notifier'
 import UserHeader from '../components/UserHeader'
-import UsersMenu from '../components/UsersMenu'
 import API from '../utils/API';
 import AppContext from '../utils/AppContext';
 
+import { useHistory } from 'react-router-dom';
 
-export default function User() {
+export default function OrderTracker() {
+    const history = useHistory()
     const { dispatch, state } = useContext(AppContext);
-    const history = useHistory();
     useEffect(() => {
+
+
         let tempToken = localStorage.getItem("conmmFete")
         if (tempToken === null) {
             history.replace(`/`)
@@ -24,18 +27,15 @@ export default function User() {
         })
             .catch(err => console.warn(err))
 
-
     }, [])
-    useEffect(() => {
-        if (state.role !== "" && state.role !== "user") {
-            history.replace(`/${state.role}`)
-        }
-    }, [state])
     return (
         <div>
+            {/* <Notifier /> */}
+            <h1>Orders Tracking</h1>
             <UserHeader />
-            <UsersMenu />
+            <MyOrders />
         </div>
     )
 }
+
 
