@@ -219,8 +219,13 @@ router.get('/allshops', async (req, res) => {
 router.get('/allmenu-users', async (req, res) => {
     try {
         const menus = await db.Menu
-            .findAll({ include: [db.Shop] }
+            .findAll({
+                where: { availability: true },
+
+                include: [{ model: db.Shop }]
+            }
             )
+        console.log(menus);
         res.status(200).json(menus)
     }
     catch (err) {
