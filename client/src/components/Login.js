@@ -1,9 +1,9 @@
 import React, { useRef, useContext } from 'react'
 import { useHistory } from "react-router-dom";
 import './login.css'
-import axios from 'axios'
 import AppContext from '../utils/AppContext';
 import API from '../utils/API';
+import Notifier from './Notifier';
 export default function Login() {
     const email = useRef('');
     const password = useRef('');
@@ -17,9 +17,21 @@ export default function Login() {
             dispatch({ type: 'update_role', role: res.data.role })
             dispatch({ type: 'update_email', email: res.data.email })
             localStorage.setItem("conmmFete", res.data.token)
+            dispatch({ type: 'notifier', display: { class: 'd-block', color: 'bg-success', text: 'Logged-in Successfully' } })
             history.push(`/${res.data.role}`)
+            setTimeout(() => {
+                dispatch({ type: 'notifier', display: { class: 'd-none', color: '', text: '' } })
+
+            }, 2000);
+
         })
-            .catch(err => console.warn(err.response.data))
+            .catch(err => {
+                dispatch({ type: 'notifier', display: { class: 'd-block', color: 'bg-danger', text: `${err.response.data}` } })
+                setTimeout(() => {
+                    dispatch({ type: 'notifier', display: { class: 'd-none', color: '', text: '' } })
+                }, 2000);
+
+            })
     }
     const handleSignup = (e, email, password) => {
         e.preventDefault()
@@ -29,14 +41,25 @@ export default function Login() {
             dispatch({ type: 'update_role', role: res.data.role })
             dispatch({ type: 'update_email', email: res.data.email })
             localStorage.setItem("conmmFete", res.data.token)
+            dispatch({ type: 'notifier', display: { class: 'd-block', color: 'bg-success', text: 'Signed-up Successfully' } })
             history.push(`/${res.data.role}`)
+            setTimeout(() => {
+                dispatch({ type: 'notifier', display: { class: 'd-none', color: '', text: '' } })
+
+            }, 2000);
         })
-            .catch(err => console.warn(err.response.data))
+            .catch(err => {
+                dispatch({ type: 'notifier', display: { class: 'd-block', color: 'bg-danger', text: `${err.response.data}` } })
+                setTimeout(() => {
+                    dispatch({ type: 'notifier', display: { class: 'd-none', color: '', text: '' } })
+                }, 2000);
+
+            })
     }
     return (
-        <>
+        <div className="container">
+            <Notifier />
             <h3 className="text-center mt-3">Login</h3>
-
             <div className="login card mx-auto p-3 mt-3">
                 <form >
 
@@ -52,7 +75,7 @@ export default function Login() {
                 <button type="submit" className="btn btn-outline-primary my-2 w-100" onClick={e => handleSignup(e, email, password)}>Sign Up</button>
 
             </div>
-        </>
+        </div>
     )
 }
 

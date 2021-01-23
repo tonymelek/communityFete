@@ -1,0 +1,9 @@
+.notification{
+    width:300px;
+    min-height: 60px;
+    color:white;
+    position: fixed;
+    top:0;
+    z-index:100;
+  }
+  

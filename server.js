@@ -1,15 +1,10 @@
+//Define Dependencies
 const express = require("express");
-const http = require('http');
 const path = require("path");
 const PORT = process.env.PORT || 3001;
 const app = express();
 const db = require('./models');
-const { jwtVerify } = require('./middleware/jwt')
-
-
-//Socket IO
 const socketio = require('socket.io');
-
 
 
 // Define middleware here
@@ -24,7 +19,6 @@ if (process.env.NODE_ENV === "production") {
 app.use('/api', require('./routes/api-routes'))
 
 // Send every other request to the React app
-// Define any API routes before this runs
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "./client/build/index.html"));
 });
@@ -34,10 +28,12 @@ app.get("*", (req, res) => {
 const users = {}
 db.sequelize.sync().then(() => {
   const server = app.listen(PORT, () => console.log(`The Express Server is now Up and running on PORT : ${PORT}`));
+
+  //Socket IO Script for Live updates
   const io = socketio(server);
-  io.on("connection", socket => {
+  io.on("connection", socket => { //Listen to Connections from users/merchants
     console.log(`New Connection Established ${socket.id}`);
-    socket.on('updateOrderStatus', async data => {
+    socket.on('updateOrderStatus', async data => { //Listen to order updates from merchants
       try {
         await db.Order.update({
           order_status: data.status
@@ -52,19 +48,8 @@ db.sequelize.sync().then(() => {
             { model: db.User, attributes: ['email'] }
             ]
           })
+        //Send updated Orders to users
         io.to(users[updatedOrder.dataValues.UserId]).emit('activeOrders', activeOrders);
-        //   const orders = await db.Order
-        //     .findAll(
-        //       {
-        //         where:
-        //         {
-        //           ShopId: updatedOrder.dataValues.ShopId,
-        //           order_status: ['paid', 'ready']
-        //         }
-        //         ,
-        //         include: [{ model: db.User, attributes: ['email'] }]
-        //       })
-        //   io.to(updatedOrder.dataValues.ShopId.toString()).emit('oldOrders', orders)
       }
 
       catch (err) {
@@ -73,17 +58,14 @@ db.sequelize.sync().then(() => {
 
     })
 
-
-
-
-
+    //Handle new user / merchant connection establishment and send initial data
     socket.on("userId", async data => {
       console.log("userId", data);
       if (data !== undefined) {
         const user = await db.User.findOne({ where: { email: data } })
         if (user.dataValues.ShopId !== null) {
           let ShopId = user.dataValues.ShopId.toString()
-          socket.join(ShopId)
+          socket.join(ShopId) //Add all merchants of same shop to a achat root to send them updates and orders of this shop
           io.to(ShopId).emit('shopConnection', `You are now connected as Shop-${ShopId}`)
           const orders = await db.Order
             .findAll(
@@ -99,7 +81,7 @@ db.sequelize.sync().then(() => {
               })
           io.to(ShopId).emit('oldOrders', orders)
         } else {
-          users[user.dataValues.id] = socket.id
+          users[user.dataValues.id] = socket.id //record user ID and socket to send them orders updates
           console.log(users[user.dataValues.id]);
           const user_orders = await db.Order
             .findAll(
@@ -122,7 +104,7 @@ db.sequelize.sync().then(() => {
     })
 
 
-
+    //Handle new orders from users
     socket.on('newOrder', async data => {
       console.log('newOrder', data);
       for (key in data) {
@@ -140,7 +122,7 @@ db.sequelize.sync().then(() => {
                 { model: db.Shop, attributes: ['name'] }
                 ]
               })
-          io.to(key).emit('oldOrders', user_orders)
+          io.to(key).emit('oldOrders', user_orders) //send order to shop room chat as they come in from user
         }
       }
 
