@@ -1,0 +1,20 @@
+.side__menu{
+    background-color: rgb(58, 58, 58);
+    color:rgb(243, 240, 235);
+    min-width: 280px;
+    position: absolute;
+height: 90vh;
+    z-index: 5;
+}
+.side__menu__item {
+border-bottom: 1px solid;
+font-size: 1.2rem;
+}
+.side__menu__item a {
+    color:  rgb(243, 240, 235);
+    text-decoration: none;
+
+}
+.side__menu__item a:hover {
+    color:  rgb(247, 248, 184);
+}

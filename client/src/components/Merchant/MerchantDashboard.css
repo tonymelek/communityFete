@@ -1,0 +1,9 @@
+.dashboard__item{
+    min-width:140px;
+    height:170px;
+    border:1px solid red;
+    margin: 10px;
+    border-radius:20px;
+    flex-grow: 1;
+  }
+  

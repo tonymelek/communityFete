@@ -8,7 +8,7 @@ import NotFound from "./pages/NotFound";
 import Merchant from "./pages/Merchant";
 import Checkout from "./pages/Checkout";
 import OrderTracker from "./pages/OrderTacker";
-// import Test from "./pages/Test";
+
 
 
 export default function App() {
@@ -40,7 +40,7 @@ export default function App() {
   }, initialState);
   return (
     <AppContext.Provider value={{ state, dispatch }}>
-      <div className="App container">
+      <div className="App">
         <BrowserRouter>
           <Switch>
             <Route path="/" exact>

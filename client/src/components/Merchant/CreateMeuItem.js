@@ -1,9 +1,10 @@
 import React, { useState, useContext } from 'react'
-import API from '../utils/API';
-import AppContext from '../utils/AppContext';
-import Notifier from './Notifier'
+import API from '../../utils/API';
+import AppContext from '../../utils/AppContext';
 
-export default function CreateMenuItem() {
+import './CreateMenuItem.css'
+
+export default function CreateMenuItem({ values }) {
 
     const [newItem, setNewItem] = useState({ item_name: '', item_desc: '', item_pic: '', unit: 'each', serve: 'sandwitch', price: 0 })
     const { dispatch, state } = useContext(AppContext);
@@ -32,28 +33,33 @@ export default function CreateMenuItem() {
             })
     }
     return (
-        <div className="create_menu_item">
-            <div className="card p-3">
-                <div className="form-group">
+        <div className={`create__menu__item ${values.create_appear}`}>
+
+            <div className="card m-3 create__menu__item__card">
+                <div className="card-header">
+                    <p onClick={() => { values.setCreate_appear('d-none') }} className="text-right">X</p>
+                    <h4 className="text-center">Create New Menu Item</h4>
+                </div>
+                <div className="form-group m-2">
                     <label htmlFor="create_menu_name">Item Name</label>
                     <input type="text" className="form-control" name="create_menu_name" id="create_menu_name" onChange={(e) => setNewItem({ ...newItem, item_name: e.target.value.trim() })} />
                 </div>
-                <div className="form-group">
+                <div className="form-group m-2">
                     <label htmlFor="create_menu_desc">Item Description</label>
                     <input type="text" className="form-control" name="create_menu_desc" id="create_menu_desc" onChange={(e) => setNewItem({ ...newItem, item_desc: e.target.value.trim() })} />
                 </div>
-                <div className="form-group">
+                <div className="form-group m-2">
                     <label htmlFor="create_menu_pic">Item Picture</label>
                     <input type="text" className="form-control" name="create_menu_pic" id="create_menu_pic" onChange={(e) => setNewItem({ ...newItem, item_pic: `https://drive.google.com/uc?export=view&id=${e.target.value.trim()}` })} />
                 </div>
-                <div className="form-group">
+                <div className="form-group m-2">
                     <label htmlFor="">Unit</label>
                     <select defaultValue="each" className="form-select" name="create_menu_unit" id="create_menu_unit" onChange={(e) => setNewItem({ ...newItem, unit: e.target.value })}>
                         <option value="each">each</option>
                         <option value="100g">100g</option>
                     </select>
                 </div>
-                <div className="form-group">
+                <div className="form-group m-2">
                     <label htmlFor="create_menu_serve">Serve</label>
                     <select className="form-select" name="create_menu_serve" id="create_menu_serve" onChange={(e) => setNewItem({ ...newItem, serve: e.target.value })}>
                         <option value="sandwitch">sandwitch</option>
@@ -62,11 +68,11 @@ export default function CreateMenuItem() {
                         <option value="ticket">ticket</option>
                     </select>
                 </div>
-                <div className="form-group">
+                <div className="form-group m-2">
                     <label htmlFor="create_menu_price">Price</label>
                     <input type="number" className="form-control" name="create_menu_price" id="create_menu_price" onChange={(e) => setNewItem({ ...newItem, price: e.target.value })} />
                 </div>
-                <button className="btn btn-primary" type="submit" onClick={e => createNewMenuItem(e, newItem)}>Create Item</button>
+                <button className="btn btn-primary m-2" type="submit" onClick={e => createNewMenuItem(e, newItem)}>Create Item</button>
             </div>
         </div>
     )

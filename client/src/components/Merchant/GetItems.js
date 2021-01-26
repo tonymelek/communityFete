@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react'
-import API from '../utils/API'
-import AppContext from '../utils/AppContext'
+import API from '../../utils/API'
+import AppContext from '../../utils/AppContext'
+
 
 export default function GetItems() {
     const [menu, setMenu] = useState([])
@@ -39,17 +40,16 @@ export default function GetItems() {
             })
     }
     return (
-        <div>
+        <div className="mb-10">
             <h3 className="text-center">Menu Items</h3>
-            {menu.filter(meal => meal.availability).map(item => <div key={item.id} className="card my-2 p-2 d-flex flex-row flex-wap justify-content-between">
+            {menu.filter(meal => meal.availability).map(item => <div key={item.id} className="card m-2 p-2 d-flex flex-row flex-wap justify-content-between">
                 <div>
-                    <p><strong>{item.item_name}</strong></p>
-                    <p>{item.item_desc}</p>
+                    <p><strong>{item.item_name}</strong> - {item.item_desc}</p>
                     <p>{item.unit}-{item.serve}-${item.price}</p>
                     <button onClick={e => deleteItem(e, item.id)} className="btn btn-danger" type="submit">Delete Item</button>
                 </div>
                 <div>
-                    <img src={item.item_pic} height="150" alt={item.item_name} />
+                    <img src={item.item_pic} height="80" alt={item.item_name} />
                 </div>
             </div>)}
         </div>

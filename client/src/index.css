@@ -1,5 +1,14 @@
+html {
+  --scrollbarBG: #CFD8DC;
+  --thumbBG: #90A4AE;
+}
 body {
   margin: 0;
   padding: 0;
   font-family: sans-serif;
+  background-color: rgb(250, 248, 244);
 }
+.container{
+  padding: 0;
+}
+

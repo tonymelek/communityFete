@@ -50,6 +50,15 @@ db.sequelize.sync().then(() => {
           })
         //Send updated Orders to users
         io.to(users[updatedOrder.dataValues.UserId]).emit('activeOrders', activeOrders);
+        const shopOrders = await db.Order
+          .findAll({
+            where: { ShopId: updatedOrder.dataValues.ShopId }
+            ,
+            include: [{ model: db.Shop, attributes: ['name', 'balance'] },
+            { model: db.User, attributes: ['email'] }
+            ]
+          })
+        io.to(updatedOrder.dataValues.ShopId.toString()).emit('oldOrders', shopOrders)
       }
 
       catch (err) {
@@ -72,12 +81,12 @@ db.sequelize.sync().then(() => {
               {
                 where:
                 {
-                  ShopId: user.dataValues.ShopId,
-                  order_status: ['paid', 'ready']
+                  ShopId: user.dataValues.ShopId
+                  // ,order_status: ['paid', 'ready']
                 }
                 ,
                 include: [{ model: db.User, attributes: ['email'] },
-                { model: db.Shop, attributes: ['name'] }]
+                { model: db.Shop, attributes: ['name', 'balance'] }]
               })
           io.to(ShopId).emit('oldOrders', orders)
         } else {
@@ -114,12 +123,12 @@ db.sequelize.sync().then(() => {
               {
                 where:
                 {
-                  ShopId: parseInt(key),
-                  order_status: ['paid', 'ready']
+                  ShopId: parseInt(key)
+                  // ,order_status: ['paid', 'ready']
                 }
                 ,
                 include: [{ model: db.User, attributes: ['email'] },
-                { model: db.Shop, attributes: ['name'] }
+                { model: db.Shop, attributes: ['name', 'balance'] }
                 ]
               })
           io.to(key).emit('oldOrders', user_orders) //send order to shop room chat as they come in from user
