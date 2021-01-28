@@ -40,8 +40,8 @@ export default function GetItems() {
             })
     }
     return (
-        <div className="mb-10">
-            <h3 className="text-center">Menu Items</h3>
+        <div className="mb-10 merchant__menu__main">
+            <h3 className="text-center py-3">Menu Items</h3>
             {menu.filter(meal => meal.availability).map(item => <div key={item.id} className="card m-2 p-2 d-flex flex-row flex-wap justify-content-between">
                 <div>
                     <p><strong>{item.item_name}</strong> - {item.item_desc}</p>

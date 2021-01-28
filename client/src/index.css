@@ -10,5 +10,19 @@ body {
 }
 .container{
   padding: 0;
-}
 
+}
+.main__flex__container{
+  height: 100vh;
+}
+.flex__main__components{
+  height: 90vh;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+::-webkit-scrollbar {
+  width: 5px;
+}
+.cursor-pointer{
+  cursor: pointer;
+}

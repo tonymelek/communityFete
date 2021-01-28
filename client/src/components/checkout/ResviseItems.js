@@ -1,13 +1,10 @@
-import React, { useContext, useEffect } from 'react'
-import { useHistory } from 'react-router-dom';
-import API from '../utils/API';
-import AppContext from '../utils/AppContext'
+import React, { useContext } from 'react'
+import API from '../../utils/API';
 import './ReviseItems.css'
-import socketIOClient from "socket.io-client";
 
-export default function ResviseItems() {
-    const { state, dispatch } = useContext(AppContext)
-    const history = useHistory();
+
+export default function ResviseItems({ props }) {
+    const { state, dispatch, history, socketIOClient } = props
     const basket = [];
     const order = {}
     let subTotal = {}
@@ -23,7 +20,7 @@ export default function ResviseItems() {
             subTotal[state.basket[item].shopId] = state.basket[item].qty * state.basket[item].price
         }
     }
-    console.log(order, subTotal);
+
     const handleSetOrders = (e) => {
         e.preventDefault();
         const socket = socketIOClient()
@@ -50,18 +47,30 @@ export default function ResviseItems() {
         }
 
     }
+    const handleDelete = (e, id) => {
+        e.preventDefault();
+        let temp = state.basket;
+        delete temp[id]
+        dispatch({ type: 'updateBasket', basket: temp })
+
+    }
     return (
-        <div>
-            <h4 className="m-2">Basket Items</h4>
-            {basket.map(item => <div key={item.id} className="card d-flex flex-row justify-content-between align-items-center p-2 m-1">
-                <p className="revised-item-width p-0 m-0"><strong>{item.item_name}</strong> x {item.qty}</p>
+        <div className="revise__items__main d-flex flex-column justify-content-between">
+            <div className="resvise__items__list">
+                <h2>Items in Basket</h2>
+                {basket.map(item => <div key={item.id} className="card d-flex flex-row justify-content-between align-items-center p-2 m-1">
+                    <p className="revised-item-width p-0 m-0"><strong>{item.item_name}</strong> x {item.qty}</p>
 
-                <p className="p-0 m-0"><strong>$</strong>{item.qty * item.price} </p>
-                <button className="btn btn-danger" type="submit">Remove</button>
+                    <p className="p-0 m-0"><strong>$</strong>{item.qty * item.price} </p>
+                    <button className="btn btn-danger" onClick={(e) => handleDelete(e, item.id)} type="submit">Remove</button>
 
-            </div>)}
-            <p className="text-danger "> **You may go back to edit quantities if required</p>
-            <button className="btn btn-success w-100" type="submit" onClick={e => handleSetOrders(e)}>Pay Now</button>
+                </div>)}
+
+            </div>
+            <div className="checkout__button">
+                <p className="text-danger "> **You may go back to edit quantities if required</p>
+                <button className="btn btn-success w-100" type="submit" onClick={e => handleSetOrders(e)}>Pay Now</button>
+            </div>
         </div>
     )
 }

@@ -1,11 +1,12 @@
 import React, { useContext, useEffect } from 'react'
 import MyOrders from '../components/MyOrders'
 import Notifier from '../components/Notifier'
-import UserHeader from '../components/UserHeader'
+
 import API from '../utils/API';
 import AppContext from '../utils/AppContext';
 
 import { useHistory } from 'react-router-dom';
+import UserFooter from '../components/user/UserFooter';
 
 export default function OrderTracker() {
     const history = useHistory()
@@ -32,7 +33,7 @@ export default function OrderTracker() {
         <div>
             {/* <Notifier /> */}
             <h1>Orders Tracking</h1>
-            <UserHeader />
+            <UserFooter />
             <MyOrders />
         </div>
     )

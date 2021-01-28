@@ -42,7 +42,10 @@ db.sequelize.sync().then(() => {
         const updatedOrder = await db.Order.findOne({ where: { id: data.id } });
         const activeOrders = await db.Order
           .findAll({
-            where: { UserId: updatedOrder.dataValues.UserId, order_status: ['paid', 'ready'] }
+            where: {
+              UserId: updatedOrder.dataValues.UserId
+              // , order_status: ['paid', 'ready'] 
+            }
             ,
             include: [{ model: db.Shop, attributes: ['name'] },
             { model: db.User, attributes: ['email'] }
@@ -69,7 +72,6 @@ db.sequelize.sync().then(() => {
 
     //Handle new user / merchant connection establishment and send initial data
     socket.on("userId", async data => {
-      console.log("userId", data);
       if (data !== undefined) {
         const user = await db.User.findOne({ where: { email: data } })
         if (user.dataValues.ShopId !== null) {
@@ -91,21 +93,19 @@ db.sequelize.sync().then(() => {
           io.to(ShopId).emit('oldOrders', orders)
         } else {
           users[user.dataValues.id] = socket.id //record user ID and socket to send them orders updates
-          console.log(users[user.dataValues.id]);
           const user_orders = await db.Order
             .findAll(
               {
                 where:
                 {
-                  UserId: user.dataValues.id,
-                  order_status: ['paid', 'ready']
+                  UserId: user.dataValues.id
+                  // , order_status: ['paid', 'ready']
                 }
                 ,
                 include: [{ model: db.User, attributes: ['email'] },
                 { model: db.Shop, attributes: ['name'] }
                 ]
               })
-          console.log(user_orders);
           io.to(users[user.dataValues.id]).emit('userOrders', user_orders)
 
         }
@@ -115,7 +115,6 @@ db.sequelize.sync().then(() => {
 
     //Handle new orders from users
     socket.on('newOrder', async data => {
-      console.log('newOrder', data);
       for (key in data) {
         if (key !== 'transaction') {
           const user_orders = await db.Order

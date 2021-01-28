@@ -143,7 +143,6 @@ router.delete('/delete-menu-item', verifyToken, async (req, res) => {
     try {
         const { token, authData } = req;
         const { item_id } = req.body;
-        console.log(item_id);
         //use authData to let only merchant at the ShopId can add items
         const user = await db.User.findOne({
             where:
@@ -159,7 +158,6 @@ router.delete('/delete-menu-item', verifyToken, async (req, res) => {
         res.status(200).send("Item Deleted Successfully")
     }
     catch (err) {
-        console.log(err);
         res.status(403).send(err)
     }
 });
@@ -225,7 +223,6 @@ router.get('/allmenu-users', async (req, res) => {
                 include: [{ model: db.Shop }]
             }
             )
-        console.log(menus);
         res.status(200).json(menus)
     }
     catch (err) {

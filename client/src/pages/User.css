@@ -1,0 +1,20 @@
+::-webkit-scrollbar {
+    width: 5px;
+  }
+  .user__header2__main{
+    background-color: rgb(58, 58, 58);
+    color:rgb(243, 240, 235);
+    position: relative;
+    z-index:10;  
+  }
+
+  .user__menu__main,.user__dashboard{
+      height:85vh;
+      overflow-y: scroll;
+      overflow-x: hidden;
+  }
+  .user__menu__items{
+    height:52vh;
+    overflow-y: scroll;
+    overflow-x: hidden;
+  }

@@ -6,11 +6,11 @@ import AppContext from '../utils/AppContext';
 import './Merchant.css'
 import socketIOClient from "socket.io-client";
 import CreateMenuItem from '../components/Merchant/CreateMeuItem';
-import MerchantHeader from '../components/Merchant/MerchantHeader';
+import Header from '../components/common/Header';
 import ManageOrders from '../components/Merchant/ManageOrders';
 import GetItems from '../components/Merchant/GetItems';
 import MerchantFooter from '../components/Merchant/MerchantFooter';
-import SideMenu from '../components/SideMenu';
+import SideMenu from '../components/common/SideMenu';
 import MerchantDashboard from '../components/Merchant/MerchantDashboard';
 
 export default function Merchant() {
@@ -70,20 +70,20 @@ export default function Merchant() {
             <Notifier />
 
             <CreateMenuItem values={{ create_appear, setCreate_appear }} />
-            <div className="d-flex flex-column merchant__flex__container ">
+            <div className="d-flex flex-column main__flex__container ">
 
-                <MerchantHeader state={state} sideDisplay={{ side, setSide }} />
+                <Header state={state} sideDisplay={{ side, setSide }} />
 
                 <div className="flex__main__components">
                     <SideMenu side={{ side, setSide }} items={sideMenu} />
                     <div className=" mx-2 merchant__section mb-10" id="Dashboard">
 
-                        <MerchantDashboard orders={oldOrders} />
+                        <MerchantDashboard orders={oldOrders} menu={menu} />
 
                     </div>
-                    <div className=" mx-2 merchant__section mb-10" id="Manage-Orders">View Orders
+                    <div className=" mx-2 merchant__section mb-10" id="Manage-Orders">
 
-                <ManageOrders values={{ state, oldOrders, setOldOrders, menu, setMenu }} />
+                        <ManageOrders values={{ state, oldOrders, setOldOrders, menu, setMenu }} />
 
                     </div>
 

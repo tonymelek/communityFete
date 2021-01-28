@@ -1,36 +1,20 @@
 .merchant__main{
     position: relative;
 }
-.merchant__flex__container{
-    height: 100vh;
-}
-.flex__main__components{
-    height: 90vh;
-    overflow-y: scroll;
-    overflow-x: hidden;
-}
-::-webkit-scrollbar {
-    width: 5px;
-} 
-/* ::-webkit-scrollbar-thumb {
-    border-radius: 10px;
-    -webkit-box-shadow: inset 0 0 6px rgb(43, 45, 46); 
-} */
+
 .create__new__item__button{
     border-radius: 25px;
    font-weight: 600;
     padding: 10px;
     margin:10px;
 }
-.merchant__header__main,.merchant__footer__main{
+.header__main,.merchant__footer__main{
     background-color: rgb(58, 58, 58);
     color:rgb(243, 240, 235);
     position: relative;
     z-index:10;
 }
-.merchant__header__main{
-    position: relative;
-}
+
 .BiMenu{
     font-size: 3.5rem;
     cursor: pointer;
@@ -48,4 +32,7 @@
 .merchant__order__status{
     font-size: 1.2rem;
    text-shadow: 2px 2px 8px lawngreen ;
+}
+.merchant__manage__orders__main,.merchant__menu__main{
+    min-height:90vh;
 }

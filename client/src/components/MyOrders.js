@@ -9,7 +9,7 @@ export default function MyOrders() {
     let stopExec = false
 
     useEffect(() => {
-        if (state.token === "" || stopExec) {
+        if (state.user_email === "" || stopExec) {
             return
         }
         stopExec = true
@@ -20,14 +20,7 @@ export default function MyOrders() {
                 setMenu(res.data);
             })
             .catch(err => console.log(err.response))
-        // API.getUserActiveOrders(state.token)
-        //     .then(res => {
-        //         setMyOrders(res.data)
 
-        //     })
-        //     .catch(err => {
-        //         console.log(err);
-        //     })
         socket.emit("userId", state.user_email)
         socket.on('userOrders', data => {
             console.log(data);
