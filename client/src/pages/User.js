@@ -49,7 +49,8 @@ export default function User() {
         const socket = socketIOClient();
         API.getMenu_user()
             .then(res => {
-                setMenu(res.data);
+                setMenu(res.data.map(item => { return { ...item, expand: false, qty: 0 } }))
+
             })
             .catch(err => console.log(err.response))
 
@@ -80,7 +81,7 @@ export default function User() {
                         <UserDashboard orders={myOrders} menu={menu} />
                     </div>
                     <div id="Order-now" className="pt-2">
-                        <UsersMenu />
+                        <UsersMenu history={history} />
                     </div>
 
                 </div>

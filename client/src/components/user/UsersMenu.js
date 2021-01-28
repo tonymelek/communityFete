@@ -1,48 +1,63 @@
 import React, { useContext, useEffect, useState } from 'react'
-import API from '../../utils/API'
+import { BiSearch } from 'react-icons/bi'
+import API from '../../utils/API';
 import AppContext from '../../utils/AppContext'
-import { Link, useHistory } from "react-router-dom";
 
-export default function UsersMenu() {
-    const { state, dispatch } = useContext(AppContext)
+export default function UsersMenu({ history }) {
+    const { dispatch, state } = useContext(AppContext);
     const [menu, setMenu] = useState([])
-    const history = useHistory();
+    const getItemsForCategory = (item = '') => [... new Set(menu.filter(element => element.item_name.toLowerCase().includes(item)).map(item => item.Shop.category))]
     let expandShrink = ['d-none', 'd-block']
     const updatedBasket = state.basket;
-    const [categories, setCategories] = useState([]);
-    const expandIntSate = {}
-
-    const [expand, setExpand] = useState(expandIntSate)
-    const [tempMenu, setTempMenu] = useState([])
+    const [search, setSearch] = useState('')
+    const [categories, setCategories] = useState([])
 
     useEffect(() => {
         API.getMenu_user()
             .then(res => {
-                setMenu(res.data);
-                setTempMenu(res.data)
+                setMenu(res.data.map(item => { return { ...item, expand: false, qty: 0 } }))
+                setCategories([... new Set(res.data.filter(element => element.item_name.toLowerCase()).map(item => item.Shop.category))])
             })
             .catch(err => console.log(err.response))
-
     }, [])
 
-    useEffect(() => {
-        let temp = [... new Set(tempMenu.map(item => item.Shop.category))]
-        setCategories(temp)
-        temp.forEach(category => expandIntSate[category] = 0)
-    }, [tempMenu])
 
-    const addToBasket = (e, item_id, item_name, price, shopId) => {
+    const addToBasket = (e, item) => {
+        const { id, item_name, price, ShopId } = item
         let qty = parseInt(e.target.value);
+        setMenu(menu.map(item => item.id === id ? { ...item, qty: qty } : item))
         if (qty > 0) {
-            updatedBasket[item_id] = { qty, item_name, price, shopId }
+            updatedBasket[id] = { qty, item_name, price, ShopId }
         } else {
-            e.target.value = 0
-            qty = 0
-            delete updatedBasket[item_id]
-
+            setMenu(menu.map(item => item.id === id ? { ...item, qty: 0 } : item))
+            delete updatedBasket[id]
         }
         dispatch({ type: 'updateBasket', basket: updatedBasket })
     }
+    const changeQty = (id, action) => {
+        setMenu(menu.map(item => {
+            if (item.id === id) {
+                let tempItem = { ...item, qty: action === "+" ? item.qty + 1 : item.qty - 1 }
+                if (tempItem.qty > 0) {
+                    updatedBasket[id] = { qty: tempItem.qty, item_name: tempItem.item_name, price: tempItem.price, ShopId: tempItem.ShopId }
+                    return tempItem
+                } else {
+                    tempItem = { ...item, qty: 0 }
+                    delete updatedBasket[id]
+                    return tempItem
+                }
+
+            }
+            else {
+                return item
+            }
+
+        }))
+        console.log(menu);
+        dispatch({ type: 'updateBasket', basket: updatedBasket })
+    }
+
+
     const handleTransfer = (e) => {
         e.preventDefault();
         if (Object.keys(state.basket).length === 0) {
@@ -56,35 +71,42 @@ export default function UsersMenu() {
     }
     const handleSearch = e => {
         e.preventDefault();
-        const searchText = e.target['search-item'].value.trim().toLowerCase();
-        setTempMenu(menu.filter(item => item.item_name.toLowerCase().includes(searchText)))
     }
-    const handleEmpty = e => {
-        e.preventDefault();
-        if (e.target.value.trim() === "") {
-            setTempMenu(menu)
-        }
-    }
+
     return (
         <div className="user__menu__main px-4 ">
 
-            <form autocomplete="off" onSubmit={e => handleSearch(e)} >
-                <div className="form-group my-2 pt-3">
-                    <label htmlFor="search-item">Search Item</label>
-                    <input type="text" name="search-item" id="search-item" className="form-control" onChange={e => handleEmpty(e)} />
+            <form autoComplete="off" onSubmit={e => handleSearch(e)} >
+                <div className="form-group my-2 pt-3 d-flex align-items-end" >
+                    <div className="flex-grow-1  mx-2" >
+                        <label htmlFor="search-item">Filter Items</label>
+                        <input type="text" name="search-item" value={search} id="search-item" className="form-control" onChange={(e) => {
+                            setSearch(e.target.value.trim().toLowerCase())
+                            setCategories(getItemsForCategory(e.target.value))
+
+                        }} />
+                    </div>
+                    <button className="btn btn-primary mx-2" type="submit"><BiSearch /></button>
                 </div>
             </form>
             <hr />
             <div className="d-flex flex-column justify-content-between">
                 <div className="user__menu__items" >
+
                     {categories.map(category => <div key={category}>
-                        <div className={`card  bg-dark my-2 p-2   text-light cursor-pointer`} onClick={() => setExpand({ ...expand, [category]: !expand[category] })}><h5>{category}</h5></div>
-                        {tempMenu.filter(items => items.Shop.category === category).map(item => <div key={item.id} className={`card  my-2 p-2 d-flex flex-row flex-wap justify-content-between animate__animated   animate__zoomIn ${expandShrink[expand[category] ? 1 : 0]}`}>
+                        <div className={`card  bg-dark my-2 p-2   text-light cursor-pointer`} onClick={() => {
+                            setMenu(menu.map(item => item.Shop.category === category ? { ...item, expand: !item.expand } : item))
+
+                        }} ><h5>{category}</h5></div>
+
+                        {menu.filter(element => element.item_name.toLowerCase().includes(search)).filter(items => items.Shop.category === category).map(item => <div key={item.id} className={`card  my-2 p-2 d-flex flex-row flex-wap justify-content-between animate__animated   animate__zoomIn ${expandShrink[item.expand ? 1 : 0]}`}>
+
                             <div>
                                 <p className="my-1"><strong>{item.item_name}</strong>-{item.serve}</p>
                                 <p className="my-1">{item.item_desc}</p>
                                 <p className="my-2">({item.unit}) ${item.price}</p>
-                        Qty<input type="number" onChange={e => addToBasket(e, item.id, item.item_name, item.price, item.ShopId)} className="form-control w-50" />
+                        Qty
+                        <button onClick={() => changeQty(item.id, "-")}>less</button><input type="number" value={item.qty} onChange={e => addToBasket(e, item)} className="form-control w-50" /><button onClick={() => changeQty(item.id, "+")}>more</button>
                             </div>
                             <div>
                                 <img src={item.item_pic} width="100" alt={item.item_name} />
