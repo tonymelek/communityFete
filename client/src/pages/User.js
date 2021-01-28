@@ -10,6 +10,7 @@ import AppContext from '../utils/AppContext';
 import './User.css'
 import socketIOClient from "socket.io-client";
 import Notifier from '../components/Notifier';
+import Loading from '../components/common/Loading';
 
 
 export default function User() {
@@ -20,6 +21,7 @@ export default function User() {
     const history = useHistory();
     const [side, setSide] = useState('d-none')
     const sideMenu = ['Dashboard', "Order-now"]
+    const [loading, setLoading] = useState(true)
     useEffect(() => {
         let tempToken = localStorage.getItem("conmmFete")
         if (tempToken === null) {
@@ -57,6 +59,7 @@ export default function User() {
         socket.emit("userId", state.user_email)
         socket.on('userOrders', data => {
             setMyOrders(data)
+            setLoading(false)
         })
 
         socket.on('activeOrders', data => {
@@ -73,9 +76,10 @@ export default function User() {
 
             <div className="d-flex flex-column main__flex__container ">
                 <Notifier />
+                <Loading loading={loading} />
                 <Header state={state} sideDisplay={{ side, setSide }} />
 
-                <div className="flex__main__components">
+                <div className={`flex__main__components ${loading ? 'hazy' : ''}`}>
                     <SideMenu side={{ side, setSide }} items={sideMenu} />
                     <div className="pt-4 user__dashboard" id="Dashboard">
                         <UserDashboard orders={myOrders} menu={menu} />

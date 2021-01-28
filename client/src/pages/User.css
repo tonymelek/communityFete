@@ -18,3 +18,7 @@
     overflow-y: scroll;
     overflow-x: hidden;
   }
+ 
+.hazy{
+  filter: blur(8px);
+}

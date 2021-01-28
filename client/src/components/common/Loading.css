@@ -1,0 +1,10 @@
+.loading__main{
+    z-index:150;
+    position: absolute;
+    top:50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.loading__main img{
+    max-width: 350px;
+}
