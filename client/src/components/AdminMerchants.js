@@ -66,7 +66,7 @@ export default function AdminMerchants() {
 
                         </select>
                     </div>
-                    <button className="btn btn-primary" type="submit" onClick={newShopCreator}>Create Shop</button>
+                    <button className="btn btn-primary my-3 " type="submit" onClick={newShopCreator}>Create Shop</button>
                 </div>
             </div>
             <h3 className="text-center my-3">Shops List</h3>

@@ -1,3 +1,18 @@
 .splash__main{
     height: 100vh;
+    background: url(fete.jpg);
+    background-size: cover;
+}
+.splash__main img{
+    max-height: 30vh;
+    max-width: 450px;
+}
+.text-purple{
+    color: rgb(107, 3, 21);
+    font-weight: 800;
+}
+
+.fete__photo{
+ width:100%;
+ height: auto;
 }

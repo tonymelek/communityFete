@@ -9,7 +9,7 @@ export default function Login() {
     const email = useRef('');
     const password = useRef('');
     const history = useHistory();
-    const { dispatch, state } = useContext(AppContext);
+    const { dispatch } = useContext(AppContext);
     const [splash, setSplash] = useState(true)
     const handleLogin = (e, email, password) => {
         e.preventDefault()
@@ -61,7 +61,7 @@ export default function Login() {
     useEffect(() => {
         setTimeout(() => {
             setSplash(false)
-        }, 20000000)
+        }, 3000)
     }, [])
 
     return (

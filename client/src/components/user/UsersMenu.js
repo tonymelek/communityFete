@@ -6,7 +6,7 @@ import AppContext from '../../utils/AppContext'
 export default function UsersMenu({ history }) {
     const { dispatch, state } = useContext(AppContext);
     const [menu, setMenu] = useState([])
-    const getItemsForCategory = (item = '') => [... new Set(menu.filter(element => element.item_name.toLowerCase().includes(item)).map(item => item.Shop.category))]
+    const getItemsForCategory = (item = '') => [...new Set(menu.filter(element => element.item_name.toLowerCase().includes(item)).map(item => item.Shop.category))];
     let expandShrink = ['d-none', 'd-block']
     const updatedBasket = state.basket;
     const [search, setSearch] = useState('')
@@ -16,7 +16,7 @@ export default function UsersMenu({ history }) {
         API.getMenu_user()
             .then(res => {
                 setMenu(res.data.map(item => { return { ...item, expand: false, qty: 0 } }))
-                setCategories([... new Set(res.data.filter(element => element.item_name.toLowerCase()).map(item => item.Shop.category))])
+                setCategories([...new Set(res.data.filter(element => element.item_name.toLowerCase()).map(item => item.Shop.category))]);
             })
             .catch(err => console.log(err.response))
     }, [])
@@ -53,7 +53,7 @@ export default function UsersMenu({ history }) {
             }
 
         }))
-        console.log(menu);
+
         dispatch({ type: 'updateBasket', basket: updatedBasket })
     }
 
@@ -105,8 +105,11 @@ export default function UsersMenu({ history }) {
                                 <p className="my-1"><strong>{item.item_name}</strong>-{item.serve}</p>
                                 <p className="my-1">{item.item_desc}</p>
                                 <p className="my-2">({item.unit}) ${item.price}</p>
-                        Qty
-                        <button onClick={() => changeQty(item.id, "-")}>less</button><input type="number" value={item.qty} onChange={e => addToBasket(e, item)} className="form-control w-50" /><button onClick={() => changeQty(item.id, "+")}>more</button>
+                                <div className="d-flex">
+                                    <button className="btn btn-dark" onClick={() => changeQty(item.id, "-")}>&#60;</button>
+                                    <input type="number" value={item.qty} onChange={e => addToBasket(e, item)} className="form-control mx-2 input__qty" />
+                                    <button className="btn btn-dark" onClick={() => changeQty(item.id, "+")}>&#62;</button>
+                                </div>
                             </div>
                             <div>
                                 <img src={item.item_pic} width="100" alt={item.item_name} />

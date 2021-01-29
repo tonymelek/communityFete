@@ -317,8 +317,9 @@ router.post('/processpayment', verifyToken, async (req, res) => {
         const orders = JSON.parse(body.orders);
 
         const subTotal = body.subTotal
-
+        console.log(orders);
         for (shop in orders) {
+            console.log(shop);
             const tempOrder = await db.Order.create({ order_custom_id: `${transaction.dataValues.id}${shop}`, order_items: JSON.stringify(orders[shop]), ShopId: parseInt(shop), order_total: subTotal[shop], UserId: user.dataValues.id, TransactionId: transaction.dataValues.id })
             response[shop] = tempOrder.dataValues;
             response[shop]["email"] = authData.email;

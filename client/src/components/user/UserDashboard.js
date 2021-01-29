@@ -21,7 +21,7 @@ export default function UserDashboard({ orders, menu }) {
             best = key
         }
     }
-    console.log(best, max);
+
 
     return (
         <div className="user__dashboard__main text-center">
@@ -35,7 +35,7 @@ export default function UserDashboard({ orders, menu }) {
                     </div>
                     <div className="dashboard__item card animate__animated  animate__bounceIn">
                         <h3>Favourite</h3>
-                        <h3 className="mt-4 text-primary">{{ ...menu.find(item => best == item.id) }.item_name}</h3>
+                        <h3 className="mt-4 text-primary">{{ ...menu.find(item => parseInt(best) === item.id) }.item_name}</h3>
 
                     </div>
                 </div>

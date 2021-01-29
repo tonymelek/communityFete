@@ -83,7 +83,7 @@ export default function Merchant() {
                     </div>
                     <div className=" mx-2 merchant__section mb-10" id="Manage-Orders">
 
-                        <ManageOrders values={{ state, oldOrders, setOldOrders, menu, setMenu }} />
+                        <ManageOrders values={{ oldOrders, menu }} />
 
                     </div>
 

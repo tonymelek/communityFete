@@ -1,7 +1,7 @@
 import React, { useReducer } from "react";
 import Login from "./components/Login";
 import AppContext from "./utils/AppContext";
-import { BrowserRouter, Switch, Route, Link } from "react-router-dom";
+import { BrowserRouter, Switch, Route } from "react-router-dom";
 import Admin from "./pages/Admin";
 import User from "./pages/User";
 import NotFound from "./pages/NotFound";

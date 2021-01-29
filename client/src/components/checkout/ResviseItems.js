@@ -1,28 +1,46 @@
-import React, { useContext } from 'react'
+import React, { useEffect, useState } from 'react'
 import API from '../../utils/API';
 import './ReviseItems.css'
 
 
 export default function ResviseItems({ props }) {
     const { state, dispatch, history, socketIOClient } = props
-    const basket = [];
-    const order = {}
-    let subTotal = {}
-    for (let item in state.basket) {
-        state.basket[item]["id"] = item
-        basket.push(state.basket[item])
-
-        if (order[state.basket[item].shopId]) {
-            order[state.basket[item].shopId].push({ id: state.basket[item].id, qty: state.basket[item].qty })
-            subTotal[state.basket[item].shopId] += state.basket[item].qty * state.basket[item].price
-        } else {
-            order[state.basket[item].shopId] = [{ id: state.basket[item].id, qty: state.basket[item].qty }]
-            subTotal[state.basket[item].shopId] = state.basket[item].qty * state.basket[item].price
+    const [basket, setBasket] = useState([]);
+    const [order, setOrder] = useState({});
+    const [subTotal, setSubTotal] = useState({});
+    const t_basket = [];
+    const t_order = {}
+    const t_subTotal = {}
+    useEffect(() => {
+        for (let item in state.basket) {
+            state.basket[item]["id"] = item
+            t_basket.push(state.basket[item])
+            let tempItem = { ...state.basket[item] }
+            if (t_order[tempItem.ShopId]) {
+                t_order[tempItem.ShopId].push({ id: tempItem.id, qty: tempItem.qty })
+                t_subTotal[tempItem.ShopId] += tempItem.qty * tempItem.price
+            } else {
+                t_order[tempItem.ShopId] = [{ id: tempItem.id, qty: tempItem.qty }]
+                t_subTotal[tempItem.ShopId] = tempItem.qty * tempItem.price
+            }
         }
-    }
+        setBasket(t_basket)
+        setOrder(t_order)
+        setSubTotal(t_subTotal)
+    }, [state])
+
+
+
 
     const handleSetOrders = (e) => {
         e.preventDefault();
+        if (state.orderTotal === 0) {
+            dispatch({ type: 'notifier', display: { class: 'd-block', color: 'bg-danger', text: 'Total should not be zero, you will be redirected to main page' } })
+            setTimeout(() => {
+                dispatch({ type: 'notifier', display: { class: 'd-none', color: '', text: '' } })
+            }, 2000);
+            return history.replace('/user')
+        }
         const socket = socketIOClient()
         if (state.balance >= state.orderTotal) {
             //call api to store transaction , update user balance , create orders in the database
@@ -69,7 +87,7 @@ export default function ResviseItems({ props }) {
             </div>
             <div className="checkout__button">
                 <p className="text-danger "> **You may go back to edit quantities if required</p>
-                <button className="btn btn-success w-100" type="submit" onClick={e => handleSetOrders(e)}>Pay Now</button>
+                <button className="btn btn-success w-100" type="submit" onClick={e => handleSetOrders(e)}>Pay Now &nbsp;&nbsp;&nbsp;&nbsp;${state.orderTotal}</button>
             </div>
         </div>
     )

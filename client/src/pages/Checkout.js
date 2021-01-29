@@ -12,7 +12,6 @@ import Notifier from '../components/Notifier';
 export default function Checkout() {
     const { dispatch, state } = useContext(AppContext);
     const [myOrders, setMyOrders] = useState([])
-    const [menu, setMenu] = useState([])
     let stopExec = false
     const history = useHistory();
 
@@ -42,11 +41,7 @@ export default function Checkout() {
         }
         stopExec = true
         const socket = socketIOClient();
-        API.getMenu_user()
-            .then(res => {
-                setMenu(res.data);
-            })
-            .catch(err => console.log(err.response))
+
 
         socket.emit("userId", state.user_email)
         socket.on('userOrders', data => {

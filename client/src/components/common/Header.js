@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { BiMenu } from 'react-icons/bi';
 import { FaUserCircle } from 'react-icons/fa';
 

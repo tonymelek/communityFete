@@ -7,6 +7,7 @@ import AppContext from '../utils/AppContext';
 
 import { useHistory } from 'react-router-dom';
 import UserFooter from '../components/user/UserFooter';
+import UserHeader from '../components/common/UserHeader';
 
 export default function OrderTracker() {
     const history = useHistory()
@@ -30,12 +31,27 @@ export default function OrderTracker() {
 
     }, [])
     return (
-        <div>
-            {/* <Notifier /> */}
-            <h1>Orders Tracking</h1>
-            <UserFooter />
-            <MyOrders />
+        <div className="container user__main">
+
+            <div className="d-flex flex-column main__flex__container ">
+                <Notifier />
+                <UserHeader state={state} />
+                <div className="flex__main__components">
+                    <div className="pt-2 px-2">
+                        <MyOrders />
+
+                    </div>
+                    <div id="Order-now" className="pt-4">
+
+                    </div>
+
+                </div>
+
+                <UserFooter />
+            </div>
+
         </div>
+
     )
 }
 

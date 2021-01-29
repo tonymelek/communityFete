@@ -84,7 +84,7 @@ export default function AdminUsers() {
             <div className="w-75 mx-auto">
                 <div className="form-group">
                     <label htmlFor="admin__search_input">Search Users</label>
-                    <input type="text" name="admin__search_input" id="admin__search_input" className="form-control mb-2" onChange={(e) => setSearchText(e.target.value)} />
+                    <input type="text" autoComplete="off" name="admin__search_input" id="admin__search_input" className="form-control mb-2" onChange={(e) => setSearchText(e.target.value)} />
                 </div>
             </div>
             <hr />

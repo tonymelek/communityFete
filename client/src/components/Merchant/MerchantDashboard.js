@@ -37,7 +37,7 @@ export default function MerchantDashboard({ orders, menu }) {
                     </div>
                     <div className="dashboard__item card animate__animated  animate__bounceIn">
                         <h3>Best Seller</h3>
-                        <h2 className="mt-3">{{ ...menu.find(item => best == item.id) }.item_name}</h2>
+                        <h2 className="mt-3">{{ ...menu.find(item => parseInt(best) === item.id) }.item_name}</h2>
                         <h5>Sold: {max}</h5>
 
                     </div>

@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import socketIOClient from "socket.io-client";
 
 export default function ManageOrders({ values }) {
 
 
-    const { state, oldOrders, setOldOrders, menu, setMenu } = values
+    const { oldOrders, menu } = values
 
 
 
@@ -33,7 +33,7 @@ export default function ManageOrders({ values }) {
 
                                     <div>{JSON.parse(item.order_items)
                                         .map((orderItem, index) => <div key={`orderItem-${index}`}>
-                                            <p>{menu.filter(menuItem => menuItem.id == orderItem.id)[0].item_name}x{orderItem.qty}</p>
+                                            <p>{{ ...menu.find(menuItem => parseInt(menuItem.id) === parseInt(orderItem.id)) }.item_name}x{orderItem.qty}</p>
                                         </div>)
                                     }
                                     </div>

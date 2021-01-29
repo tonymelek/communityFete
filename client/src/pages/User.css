@@ -22,3 +22,20 @@
 .hazy{
   filter: blur(8px);
 }
+.input__qty{
+  width:5rem;
+  text-align: right;
+}
+.bg-header{
+  background-image: linear-gradient(rgb(148, 148, 148), rgb(245, 252, 248));
+}
+.bg-paid{
+  background-image: linear-gradient(rgb(230, 250, 143), rgb(236, 240, 188));
+}
+.bg-ready{
+  background-image: linear-gradient(rgb(138, 240, 146), rgb(199, 226, 204));
+}
+.myorder__items {
+border-bottom-left-radius: 10px;
+border-bottom-right-radius: 10px;
+}
