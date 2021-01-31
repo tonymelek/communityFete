@@ -115,6 +115,7 @@ db.sequelize.sync().then(() => {
 
     //Handle new orders from users
     socket.on('newOrder', async data => {
+
       for (key in data) {
         if (key !== 'transaction') {
           const user_orders = await db.Order

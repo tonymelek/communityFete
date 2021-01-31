@@ -81,47 +81,50 @@ export default function AdminUsers() {
     }
     return (
         <div>
-            <div className="w-75 mx-auto">
-                <div className="form-group">
-                    <label htmlFor="admin__search_input">Search Users</label>
-                    <input type="text" autoComplete="off" name="admin__search_input" id="admin__search_input" className="form-control mb-2" onChange={(e) => setSearchText(e.target.value)} />
+            <div>
+                <div className="w-75 mx-auto">
+                    <div className="form-group">
+                        <label htmlFor="admin__search_input">Search Users</label>
+                        <input type="text" autoComplete="off" name="admin__search_input" id="admin__search_input" className="form-control mb-2" onChange={(e) => setSearchText(e.target.value)} />
+                    </div>
+                </div>
+                <hr />
+                <div className="d-flex flex-row flex-wrap justify-content-around">
+                    {users.filter(filtered => filtered.email.toLowerCase().includes(searchText.trim().toLowerCase()))
+                        .map(user => <div key={user.email} className="admin__users  card m-2">
+                            <div className="card-header">
+                                <h5 className="text-center"> {user.email}</h5>
+                            </div>
+                            <div className="card-body d-flex flex-wrap justify-content-between align-items-center">
+                                <div className="form-group d-flex justify-content-between align-items-center px-2 my-1 flex-grow-1">
+                                    <p className="px-2 m-0">Role </p>
+                                    <select defaultValue={user.role} onChange={e => update(e, user.email, "role")}>
+                                        <option value="user" >user</option>
+                                        <option value="merchant" >merchant</option>
+                                    </select>
+                                </div>
+                                {user.role === "merchant" ?
+                                    <div className="form-group d-flex justify-content-between align-items-center p-2 my-2 flex-grow-1">
+
+                                        <p className="px-2 m-0">Shop </p>
+                                        <select onChange={e => update(e, user.email, "shop")}>
+                                            <option value=""></option>
+                                            {shops.map(shop => <option key={`shop-${shop.id}`} value={shop.id} selected={user.ShopId === shop.id}>{shop.name}</option>)}
+                                        </select>
+                                    </div> : null}
+                                {user.role === "user" ?
+                                    <div className="d-flex flex-row justify-content-between align-items-center my-2 p-2 flex-grow-1">
+                                        <p className="px-2 m-0">Top up Balance</p>
+
+                                        <input type="number" name="user__topup" onChange={e => update(e, user.email, "balance")} className="admin__user__topup" />
+
+                                    </div> : null}
+                                <button type="submit" className="btn btn-warning w-100" onClick={e => handleUpdate(e, user.email, user.balance)}>Update</button>
+                            </div>
+
+                        </div>)}
                 </div>
             </div>
-            <hr />
-
-            {users.filter(filtered => filtered.email.toLowerCase().includes(searchText.trim().toLowerCase()))
-                .map(user => <div key={user.email} className="admin__users card my-2">
-                    <div className="card-header">
-                        <h5 className="text-center"> {user.email}</h5>
-                    </div>
-                    <div className="card-body d-flex flex-wrap justify-content-between align-items-center">
-                        <div className="form-group d-flex justify-content-between align-items-center p-2 my-2 flex-grow-1">
-                            <p className="px-2 m-0">Role </p>
-                            <select defaultValue={user.role} onChange={e => update(e, user.email, "role")}>
-                                <option value="user" >user</option>
-                                <option value="merchant" >merchant</option>
-                            </select>
-                        </div>
-                        {user.role === "merchant" ?
-                            <div className="form-group d-flex justify-content-between align-items-center p-2 my-2 flex-grow-1">
-
-                                <p className="px-2 m-0">Shop </p>
-                                <select onChange={e => update(e, user.email, "shop")}>
-                                    <option value=""></option>
-                                    {shops.map(shop => <option key={`shop-${shop.id}`} value={shop.id} selected={user.ShopId === shop.id}>{shop.name}</option>)}
-                                </select>
-                            </div> : null}
-                        {user.role === "user" ?
-                            <div className="d-flex flex-row justify-content-between align-items-center my-2 p-2 flex-grow-1">
-                                <p className="px-2 m-0">Top up Balance</p>
-
-                                <input type="number" name="user__topup" onChange={e => update(e, user.email, "balance")} className="admin__user__topup" />
-
-                            </div> : null}
-                        <button type="submit" className="btn btn-warning w-100" onClick={e => handleUpdate(e, user.email, user.balance)}>Update</button>
-                    </div>
-
-                </div>)}
         </div>
     )
 }

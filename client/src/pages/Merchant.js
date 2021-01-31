@@ -78,7 +78,7 @@ export default function Merchant() {
                     <SideMenu side={{ side, setSide }} items={sideMenu} />
                     <div className=" mx-2 merchant__section mb-10" id="Dashboard">
 
-                        <MerchantDashboard orders={oldOrders} menu={menu} />
+                        <MerchantDashboard orders={oldOrders} menu={menu} state={state} />
 
                     </div>
                     <div className=" mx-2 merchant__section mb-10" id="Manage-Orders">

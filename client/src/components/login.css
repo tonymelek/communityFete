@@ -1,3 +1,10 @@
 .login{
     max-width:450px;
 }
+.login__main{
+    display: grid;
+    place-items: center;
+    height: 100vh;
+    background: url('./common/fete.jpg');
+    background-size: cover;
+}

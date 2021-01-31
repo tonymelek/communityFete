@@ -3,3 +3,10 @@
 .admin__user__topup{
     max-width:5rem;
 }
+.admin__component{
+    padding: 20px;
+    height: 90vh;
+}
+.admin__users{
+    max-width: 350px;
+}

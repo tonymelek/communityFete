@@ -130,6 +130,21 @@ export default {
                 authorization: `bearer ${token}`
             }
         })
+    },
+    getMerchantsPerShop(email) {
+        return axios({
+            method: 'get',
+            url: `/api/merchants/${email}`
+        })
+    },
+    getAdminStats(token) {
+        return axios({
+            method: 'get',
+            url: '/api/admin-stats',
+            headers: {
+                authorization: `bearer ${token}`
+            }
+        })
     }
 
 

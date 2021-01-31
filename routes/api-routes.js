@@ -6,6 +6,7 @@ const bcrypt = require('bcrypt');
 const { jwtSign } = require('./../middleware/jwt')
 const verifyToken = require('../middleware/verifyToken');
 const isStrong = require('../middleware/checkpassstrength');
+const { sequelize } = require('../models');
 
 
 //Create new Shop
@@ -339,6 +340,51 @@ router.post('/processpayment', verifyToken, async (req, res) => {
     }
 })
 
+//Get number of merchants for a shop id
+router.get('/merchants/:email', async (req, res) => {
+    try {
+        const user = await db.User.findOne({ where: { email: req.params.email } })
+        const merchantsCount = await db.User.count({ where: { ShopId: user.dataValues.ShopId } })
+        console.log(req.params.email, merchantsCount);
+        res.json({ merchantsCount })
+    }
+    catch (err) {
+        throw new Error(err)
+    }
+})
+
+//Get Admin Statistics
+router.get('/admin-stats', verifyToken, async (req, res) => {
+    try {
+        const { authData } = req
+        if (authData.role !== "admin") {
+            return res.status(403).send("Sorry you are not authorized to access this information")
+        }
+        // Get number of users
+        const numberOfUsers = await db.User.count({ where: { role: "user" } })
+        const numberOfMerchants = await db.User.count({ where: { role: "merchant" } })
+        const numberOfOrders = await db.Order.count()
+        const totalSpend = await db.Order.findAll({ attributes: [[sequelize.fn('sum', sequelize.col('order_total')), 'total']] })
+        const highestSpender = await db.Order.findAll({
+            attributes: ['UserId', [sequelize.fn('sum', sequelize.col('order_total')), 'total']],
+            group: 'UserId',
+            include: [{ model: db.User, attributes: ['email'] }],
+            order: sequelize.literal('total DESC'),
+            limit: 1
+        })
+        const bestShop = await db.Order.findAll({
+            attributes: ['ShopId', [sequelize.fn('sum', sequelize.col('order_total')), 'total'], [sequelize.fn('count', sequelize.col('order_total')), 'count']],
+            group: 'ShopId',
+            include: [{ model: db.Shop, attributes: ['name'] }],
+            order: sequelize.literal('total DESC'),
+            limit: 1
+        })
+        res.json({ numberOfUsers, numberOfMerchants, numberOfOrders, totalSpend, highestSpender, bestShop })
+    }
+    catch (err) {
+        throw new Error(err)
+    }
+})
 
 //export router
 module.exports = router

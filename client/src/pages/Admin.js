@@ -1,4 +1,4 @@
-import React, { useEffect, useContext } from 'react'
+import React, { useEffect, useContext, useState } from 'react'
 import API from '../utils/API'
 import AppContext from '../utils/AppContext';
 import { useHistory } from "react-router-dom";
@@ -6,11 +6,15 @@ import './Admin.css'
 import Notifier from '../components/Notifier';
 import AdminUsers from '../components/AdminUsers';
 import AdminMerchants from '../components/AdminMerchants';
+import Header from '../components/common/Header';
+import SideMenu from '../components/common/SideMenu';
+import AdminDashboard from '../components/AdminDashboard';
 export default function Admin() {
 
-
+    const [side, setSide] = useState('d-none')
+    const sideMenu = ['Dashboard', 'Manage-Shops', 'Manage-Users']
     const history = useHistory();
-    const { dispatch } = useContext(AppContext);
+    const { dispatch, state } = useContext(AppContext);
     useEffect(() => {
         let tempToken = localStorage.getItem("conmmFete")
         if (tempToken === null) {
@@ -30,15 +34,26 @@ export default function Admin() {
 
 
     return (
-        <div className="container">
+        <div className="container admin__main">
             <Notifier />
-            <div className="row">
-                <div className="col-12 col-md-6 admin__users__container  d-flex flex-column mx-auto mt-3 p-2">
-                    <AdminUsers />
+
+
+
+            <div className="d-flex flex-column main__flex__container ">
+                <Header state={state} sideDisplay={{ side, setSide }} />
+                <div className="flex__main__components">
+                    <SideMenu side={{ side, setSide }} items={sideMenu} />
+                    <div className="admin__component mx-2 mb-10" id="Dashboard">
+                        <AdminDashboard state={state} />
+                    </div>
+                    <div className="admin__component mx-2 mb-10" id="Manage-Shops">
+                        <AdminMerchants />
+                    </div>
+                    <div className="admin__component mx-2 mb-10" id="Manage-Users">
+                        <AdminUsers />
+                    </div>
                 </div>
-                <div className="col-12 col-md-6 admin__users__container  d-flex flex-column mx-auto mt-3 p-2">
-                    <AdminMerchants />
-                </div>
+
             </div>
         </div>
     )

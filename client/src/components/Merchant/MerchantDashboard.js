@@ -1,7 +1,8 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import API from '../../utils/API';
 import './MerchantDashboard.css'
-export default function MerchantDashboard({ orders, menu }) {
-    console.log(orders);
+export default function MerchantDashboard({ orders, menu, state }) {
+    const [merchants, setMerchants] = useState(0)
     let formatted_orders = orders.map(order => {
         return JSON.parse(order.order_items)
     }).flat();
@@ -13,7 +14,7 @@ export default function MerchantDashboard({ orders, menu }) {
             stats[order.id] = order.qty
         }
     }
-    console.log(stats);
+
     let max = 0
     let best;
     for (let key in stats) {
@@ -22,9 +23,18 @@ export default function MerchantDashboard({ orders, menu }) {
             best = key
         }
     }
-    console.log(best, max);
+    useEffect(() => {
+        if (state.user_email === "") {
+            return
+        }
+        API.getMerchantsPerShop(state.user_email)
+            .then(res => {
+                setMerchants(res.data.merchantsCount)
+            })
+            .catch(err => console.log(err))
+    }, [state])
 
-    console.log(menu);
+
     return (
         <div className="merchant__dasboard__main text-center">
             <h3 className="text-center py-3">Merchant Dashboard</h3>
@@ -49,7 +59,8 @@ export default function MerchantDashboard({ orders, menu }) {
                     </div>
                     <div className="dashboard__item card animate__animated  animate__bounceIn">
                         <h3>Merchants</h3>
-                        {/* Needs API end point */}
+                        <h1 className="display-1 mt-4 text-danger">{merchants}</h1>
+
                     </div>
                 </div>
             </div>
