@@ -20,7 +20,11 @@ export default function OrderTracker() {
             history.replace(`/`)
             return
         }
+
         API.getThisUser(tempToken).then(res => {
+            if (res.data.role !== "user") {
+                return history.replace(`/${res.data.role}`)
+            }
             dispatch({ type: 'update_token', token: res.data.token })
             dispatch({ type: 'update_balance', balance: res.data.balance })
             dispatch({ type: 'update_role', role: res.data.role })

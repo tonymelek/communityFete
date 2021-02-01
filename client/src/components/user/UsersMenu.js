@@ -27,7 +27,7 @@ export default function UsersMenu({ history }) {
         let qty = parseInt(e.target.value);
         setMenu(menu.map(item => item.id === id ? { ...item, qty: qty } : item))
         if (qty > 0) {
-            updatedBasket[id] = { qty, item_name, price, ShopId }
+            updatedBasket[id] = { id, qty, item_name, price, ShopId }
         } else {
             setMenu(menu.map(item => item.id === id ? { ...item, qty: 0 } : item))
             delete updatedBasket[id]
@@ -39,7 +39,7 @@ export default function UsersMenu({ history }) {
             if (item.id === id) {
                 let tempItem = { ...item, qty: action === "+" ? item.qty + 1 : item.qty - 1 }
                 if (tempItem.qty > 0) {
-                    updatedBasket[id] = { qty: tempItem.qty, item_name: tempItem.item_name, price: tempItem.price, ShopId: tempItem.ShopId }
+                    updatedBasket[id] = { id, qty: tempItem.qty, item_name: tempItem.item_name, price: tempItem.price, ShopId: tempItem.ShopId }
                     return tempItem
                 } else {
                     tempItem = { ...item, qty: 0 }
@@ -75,7 +75,6 @@ export default function UsersMenu({ history }) {
 
     return (
         <div className="user__menu__main px-4 ">
-
             <form autoComplete="off" onSubmit={e => handleSearch(e)} >
                 <div className="form-group my-2 pt-3 d-flex align-items-end" >
                     <div className="flex-grow-1  mx-2" >

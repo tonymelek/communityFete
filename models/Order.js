@@ -4,10 +4,12 @@ module.exports = function (sequelize, DataTypes) {
             type: DataTypes.STRING,
             allowNull: false,
         },
-        order_items: {
-            type: DataTypes.TEXT,
+
+        item_qty: {
+            type: DataTypes.INTEGER,
             allowNull: false,
-        },
+        }
+        ,
         order_status: {
             type: DataTypes.STRING,
             allowNull: false,
@@ -32,6 +34,11 @@ module.exports = function (sequelize, DataTypes) {
             },
         });
         Order.belongsTo(models.Transaction, {
+            foreignKey: {
+                allowNull: false,
+            },
+        });
+        Order.belongsTo(models.Menu, {
             foreignKey: {
                 allowNull: false,
             },

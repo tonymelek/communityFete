@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react'
-import API from '../utils/API'
-import AppContext from '../utils/AppContext';
+import API from '../../utils/API'
+import AppContext from '../../utils/AppContext';
 import { useHistory } from "react-router-dom";
 
 export default function AdminMerchants() {
