@@ -13,7 +13,6 @@ export default function ResviseItems({ props }) {
     const t_subTotal = {}
     useEffect(() => {
         for (let item in state.basket) {
-            state.basket[item]["id"] = item
             t_basket.push(state.basket[item])
             let tempItem = { ...state.basket[item] }
             if (t_order[tempItem.ShopId]) {
@@ -44,7 +43,13 @@ export default function ResviseItems({ props }) {
         const socket = socketIOClient()
         if (state.balance >= state.orderTotal) {
             //call api to store transaction , update user balance , create orders in the database
-            API.processPayment({ orders: JSON.stringify(order), subTotal, total: state.orderTotal }, state.token)
+            API.processPayment(
+                {
+                    orders: JSON.stringify(order),
+                    subTotal,
+                    total: state.orderTotal
+                },
+                state.token)
                 .then(res => {
                     console.log(res.data)
                     socket.emit('newOrder', res.data)
@@ -57,6 +62,9 @@ export default function ResviseItems({ props }) {
                 dispatch({ type: 'notifier', display: { class: 'd-none', color: '', text: '' } })
                 history.replace('/order-tracker')
             }, 2000);
+            dispatch({ type: 'updateBasket', basket: {} })
+
+
         } else {
             dispatch({ type: 'notifier', display: { class: 'd-block', color: 'bg-danger', text: 'Your Balance is insufficient' } })
             setTimeout(() => {

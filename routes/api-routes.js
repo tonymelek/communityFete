@@ -316,15 +316,28 @@ router.post('/processpayment', verifyToken, async (req, res) => {
 
         response.transaction = transaction.dataValues;
         const orders = JSON.parse(body.orders);
-
         const subTotal = body.subTotal
-        console.log(orders);
+        console.log('orders', orders);
         for (shop in orders) {
-            console.log(shop);
-            const tempOrder = await db.Order.create({ order_custom_id: `${transaction.dataValues.id}${shop}`, order_items: JSON.stringify(orders[shop]), ShopId: parseInt(shop), order_total: subTotal[shop], UserId: user.dataValues.id, TransactionId: transaction.dataValues.id })
-            response[shop] = tempOrder.dataValues;
-            response[shop]["email"] = authData.email;
-            response[shop]["total"] = subTotal[shop];
+            console.log('shop', shop);
+            for (item of orders[shop]) {
+                console.log(item);
+                const tempOrder = await db.Order.create(
+                    {
+                        order_custom_id: `${transaction.dataValues.id}${shop}`
+                        , MenuId: item.id,
+                        item_qty: item.qty,
+                        ShopId: parseInt(shop),
+                        order_total: subTotal[shop],
+                        UserId: user.dataValues.id,
+                        TransactionId: transaction.dataValues.id
+                    })
+                console.log(tempOrder.dataValues);
+                response[shop] = tempOrder.dataValues;
+                response[shop]["total"] = subTotal[shop];
+            }
+
+
             //add value to shop balance
             await db.Shop.update({
                 balance: db.sequelize.literal(`balance+${subTotal[shop]}`)
@@ -333,6 +346,7 @@ router.post('/processpayment', verifyToken, async (req, res) => {
                     where: { id: parseInt(shop) }
                 })
         }
+        console.log(response);
         res.status(200).json(response)
     }
     catch (err) {
@@ -356,33 +370,83 @@ router.get('/merchants/:email', async (req, res) => {
 //Get Admin Statistics
 router.get('/admin-stats', verifyToken, async (req, res) => {
     try {
-        const { authData } = req
+        const { authData, token } = req
+        console.log(token);
         if (authData.role !== "admin") {
             return res.status(403).send("Sorry you are not authorized to access this information")
         }
         // Get number of users
         const numberOfUsers = await db.User.count({ where: { role: "user" } })
         const numberOfMerchants = await db.User.count({ where: { role: "merchant" } })
-        const numberOfOrders = await db.Order.count()
-        const totalSpend = await db.Order.findAll({ attributes: [[sequelize.fn('sum', sequelize.col('order_total')), 'total']] })
-        const highestSpender = await db.Order.findAll({
-            attributes: ['UserId', [sequelize.fn('sum', sequelize.col('order_total')), 'total']],
-            group: 'UserId',
+        const numberOfOrders = await db.Order.aggregate('TransactionId', 'DISTINCT', { plain: false })
+        const totalSpend = await db.Transaction.findAll({
+            where: { amount: { [db.Sequelize.Op.gt]: 0 } },
+            attributes: [[sequelize.fn('sum', sequelize.col('amount')), 'total']]
+        })
+        console.log(totalSpend);
+        const highestSpender = await db.Transaction.findAll({
+            where: { amount: { [db.Sequelize.Op.gt]: 0 } },
+            attributes: ['UserId', [sequelize.fn('sum', sequelize.col('amount')), 'total']],
+            group: ['UserId'],
             include: [{ model: db.User, attributes: ['email'] }],
             order: sequelize.literal('total DESC'),
             limit: 1
         })
-        const bestShop = await db.Order.findAll({
-            attributes: ['ShopId', [sequelize.fn('sum', sequelize.col('order_total')), 'total'], [sequelize.fn('count', sequelize.col('order_total')), 'count']],
-            group: 'ShopId',
-            include: [{ model: db.Shop, attributes: ['name'] }],
-            order: sequelize.literal('total DESC'),
-            limit: 1
-        })
-        res.json({ numberOfUsers, numberOfMerchants, numberOfOrders, totalSpend, highestSpender, bestShop })
+        const orders = await db.Order.findAll({ include: [{ model: db.Shop, attributes: ['name'] }] })
+        res.json({ numberOfUsers, numberOfMerchants, numberOfOrders: numberOfOrders.length, totalSpend, highestSpender, orders })
     }
     catch (err) {
         throw new Error(err)
+    }
+})
+
+//AdminFooterDetails
+router.get('/admin-footer', verifyToken, async (req, res) => {
+    try {
+        const { authData, token } = req
+        if (authData.role !== "admin") {
+            return res.status(403).send("Sorry you are not authorized to access this information")
+        }
+        const shops = await db.Shop.count()
+        const users = await db.User.count()
+        res.json({ shops, users })
+    }
+    catch (err) {
+        throw err
+    }
+})
+
+
+//TEST API BEST SELLERS
+router.get('/test', async (req, res) => {
+    try {
+        const test = await db.Order.findAll({
+            attributes: [[sequelize.fn('sum', sequelize.col('item_qty')), 'totalSold']],
+            group: ['MenuId'],
+            include: [{ model: db.Menu, attributes: ['item_name'] }, { model: db.Shop, attributes: ['name'] }],
+            order: sequelize.literal('totalSold DESC'),
+            limit: 3
+        })
+        res.json(test)
+
+    } catch (error) {
+        throw error
+    }
+})
+
+//TEST DISTINCT
+router.get('/test2', async (req, res) => {
+    try {
+        const test = await db.Order.findAll({
+            attributes: [[sequelize.fn('distinct', sequelize.col('order_custom_id')), 'order_custom_id'], 'order_total', 'ShopId'],
+            order: sequelize.literal('ShopId ASC')
+        })
+
+
+        res.json(test)
+
+    } catch (error) {
+        throw error
     }
 })
 

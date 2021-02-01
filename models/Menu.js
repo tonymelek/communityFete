@@ -45,6 +45,7 @@ module.exports = function (sequelize, DataTypes) {
                 allowNull: true,
             },
         });
+        Menu.hasMany(models.Order);
 
     }
 

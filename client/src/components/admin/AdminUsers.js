@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react'
-import API from '../utils/API'
-import AppContext from '../utils/AppContext';
 import { useHistory } from "react-router-dom";
+import API from '../../utils/API';
+import AppContext from '../../utils/AppContext';
 
 export default function AdminUsers() {
     const history = useHistory();

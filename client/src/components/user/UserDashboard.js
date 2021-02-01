@@ -1,18 +1,35 @@
 import React from 'react'
 
-export default function UserDashboard({ orders, menu }) {
-    let activeOrders = orders.filter(order => order.order_status !== 'received')
-    let formatted_orders = orders.map(order => {
-        return JSON.parse(order.order_items)
-    }).flat();
-    let stats = {}
-    for (let order of formatted_orders) {
-        if (stats[order.id]) {
-            stats[order.id] += order.qty
+export default function UserDashboard({ orders }) {
+
+    const separators = [...new Set(orders.map(item => item.order_custom_id))]
+
+    const stats = {}
+    const formatted = {}
+    let active = 0
+    let spent = 0
+
+    for (let order of orders) {
+        if (stats[order.Menu.item_name]) {
+            stats[order.Menu.item_name] += order.item_qty
         } else {
-            stats[order.id] = order.qty
+            stats[order.Menu.item_name] = order.item_qty
+        }
+        if (formatted[order.order_custom_id]) {
+            formatted[order.order_custom_id]['items'].push(order)
+        }
+        else {
+            formatted[order.order_custom_id] = {}
+            formatted[order.order_custom_id]['items'] = [order]
+            formatted[order.order_custom_id]['total'] = order.order_total
+            if (order.order_status !== 'received') {
+                active++
+                spent += order.order_total
+            }
         }
     }
+    console.log(formatted, active);
+
     let max = 0
     let best;
     for (let key in stats) {
@@ -31,22 +48,22 @@ export default function UserDashboard({ orders, menu }) {
                 <div className="d-flex flex-grow-1 justify-content-around">
                     <div className="dashboard__item card animate__animated  animate__bounceIn">
                         <h3>Total Orders</h3>
-                        <h1 className="display-4  mt-4 text-danger">{orders.length}</h1>
+                        <h1 className="display-4  mt-4 text-danger">{Object.keys(formatted).length}</h1>
                     </div>
                     <div className="dashboard__item card animate__animated  animate__bounceIn">
                         <h3>Favourite</h3>
-                        <h3 className="mt-4 text-primary">{{ ...menu.find(item => parseInt(best) === item.id) }.item_name}</h3>
+                        <h3 className="mt-4 text-primary">{best}</h3>
 
                     </div>
                 </div>
                 <div className="d-flex  flex-grow-1 justify-content-around">
                     <div className="dashboard__item card animate__animated  animate__bounceIn">
                         <h3>Active Orders</h3>
-                        <h1 className="display-4  mt-4 text-primary">{activeOrders.length}</h1>
+                        <h1 className="display-4  mt-4 text-primary">{active}</h1>
                     </div>
                     <div className="dashboard__item card animate__animated  animate__bounceIn">
                         <h3>Total Spent</h3>
-                        <h1 className="mt-4">$<span className="display-4 text-danger">{orders.reduce((b, a) => b + a.order_total, 0)}</span></h1>
+                        <h1 className="mt-4">$<span className="display-4 text-danger">{spent}</span></h1>
 
                     </div>
                 </div>
