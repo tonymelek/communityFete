@@ -145,6 +145,15 @@ export default {
                 authorization: `bearer ${token}`
             }
         })
+    },
+    getAdminFooter(token) {
+        return axios({
+            method: 'get',
+            url: '/api/admin-footer',
+            headers: {
+                authorization: `bearer ${token}`
+            }
+        })
     }
 
 

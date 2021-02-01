@@ -1,11 +1,9 @@
 import React from 'react'
 import socketIOClient from "socket.io-client";
 
-export default function ManageOrders({ values }) {
+export default function ManageOrders({ myOrders, menu }) {
 
-
-    const { oldOrders, menu } = values
-
+    const separators = [...new Set(myOrders.map(item => item.order_status !== 'received' ? item.order_custom_id : null).filter(el => el !== null))]
 
 
     const updateOrderStatus = (e, order_id, status) => {
@@ -22,35 +20,44 @@ export default function ManageOrders({ values }) {
         <div className="merchant__manage__orders__main">
             <h3 className="text-center py-3">Manage Orders</h3>
             <div className="d-flex flex-wrap justify-content-around">
-                {oldOrders.filter(order => order.order_status !== "received").length === 0 ? <h2 className="text-danger">No active Orders</h2> : <>
-                    {
-                        oldOrders.filter(order => order.order_status !== "received").map(item => <div key={item.id} className="card m-3  merchant__orders my-2 ">
-                            <div className="card-header">
-                                <h5 className="text-center"><span className="text-primary">Order # {item.id} </span>- {item.User.email}</h5>
-                            </div>
-                            <div className="card-body">
-                                <div className="d-flex justify-content-between">
 
-                                    <div>{JSON.parse(item.order_items)
-                                        .map((orderItem, index) => <div key={`orderItem-${index}`}>
-                                            <p>{{ ...menu.find(menuItem => parseInt(menuItem.id) === parseInt(orderItem.id)) }.item_name}x{orderItem.qty}</p>
-                                        </div>)
-                                    }
+                <div className="d-flex flex-wrap justify-content-center">
+
+                    {separators.map(separator => <div key={separator}>
+
+                        <div className="card  myorder__items m-2 ">
+                            <div className="card-header bg-header">
+                                <h4 className="text-center">Order#<span className="text-danger"> {separator} </span>- Shop: <span className="text-primary">{{ ...{ ...myOrders.find(order => order.order_custom_id === separator) }.Shop }.name}</span></h4>
+                            </div>
+                            <div className={`card-body  ${{ ...myOrders.find(order => order.order_custom_id === separator) }.order_status === 'paid' ? 'bg-paid' : 'bg-ready'}`}>
+                                <div className="d-flex flex-column">
+                                    <div className="d-flex  justify-content-between myorder__items">
+                                        <div>
+                                            <h5 className="m-1 p-0">Items</h5>
+                                            {myOrders.filter(orders => orders.order_custom_id === separator)
+                                                .map(order => <div key={order.id}>
+                                                    {<ul className="p-1 m-0 list-unstyled">
+                                                        <li ><>{order.Menu.item_name}x{order.item_qty}</></li>
+                                                    </ul>}
+                                                </div>)}
+                                        </div>
+                                        <div>
+                                            <h1>${{ ...myOrders.find(order => order.order_custom_id === separator) }.order_total}</h1>
+                                            <h5>&#8226; {{ ...myOrders.find(order => order.order_custom_id === separator) }.order_status}</h5>
+                                        </div>
                                     </div>
                                     <div>
-                                        <li className={`${item.order_status === 'paid' ? 'text-danger' : 'text-success'} merchant__order__status`}><strong>{item.order_status}</strong></li>
+                                        {{ ...myOrders.find(order => order.order_custom_id === separator) }.order_status === 'paid' &&
+                                            <button className="btn btn-warning d-block w-100 my-2" onClick={e => updateOrderStatus(e, separator, "ready")}>Ready</button>}
+                                        {{ ...myOrders.find(order => order.order_custom_id === separator) }.order_status === 'ready' &&
+                                            <button className="btn btn-success d-block w-100 my-2" onClick={e => updateOrderStatus(e, separator, "received")}>Collected</button>}
                                     </div>
                                 </div>
-                                {item.order_status === 'paid' &&
-                                    <button className="btn btn-warning d-block w-100 my-2" onClick={e => updateOrderStatus(e, item.id, "ready")}>Ready</button>}
-                                {item.order_status === 'ready' &&
-                                    <button className="btn btn-success d-block w-100 my-2" onClick={e => updateOrderStatus(e, item.id, "received")}>Collected</button>}
-
                             </div>
-                        </div>)
-                    } </>
-                }
+                        </div>
+                    </div>)}
 
+                </div>
             </div>
         </div>
     )

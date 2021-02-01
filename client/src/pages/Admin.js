@@ -4,11 +4,12 @@ import AppContext from '../utils/AppContext';
 import { useHistory } from "react-router-dom";
 import './Admin.css'
 import Notifier from '../components/Notifier';
-import AdminUsers from '../components/AdminUsers';
-import AdminMerchants from '../components/AdminMerchants';
+import AdminUsers from '../components/admin/AdminUsers';
+import AdminMerchants from '../components/admin/AdminMerchants';
 import Header from '../components/common/Header';
 import SideMenu from '../components/common/SideMenu';
-import AdminDashboard from '../components/AdminDashboard';
+import AdminDashboard from '../components/admin/AdminDashboard';
+import AdminFooter from '../components/admin/AdminFooter';
 export default function Admin() {
 
     const [side, setSide] = useState('d-none')
@@ -41,6 +42,7 @@ export default function Admin() {
 
             <div className="d-flex flex-column main__flex__container ">
                 <Header state={state} sideDisplay={{ side, setSide }} />
+
                 <div className="flex__main__components">
                     <SideMenu side={{ side, setSide }} items={sideMenu} />
                     <div className="admin__component mx-2 mb-10" id="Dashboard">
@@ -53,7 +55,7 @@ export default function Admin() {
                         <AdminUsers />
                     </div>
                 </div>
-
+                <AdminFooter state={state} />
             </div>
         </div>
     )
