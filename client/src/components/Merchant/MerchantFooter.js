@@ -24,9 +24,10 @@ export default function MerchantFooter({ orders }) {
             formatted[order.order_custom_id] = {}
             formatted[order.order_custom_id]['items'] = [order]
             formatted[order.order_custom_id]['total'] = order.order_total
+            balance += order.order_total
             if (order.order_status !== 'received') {
                 active++
-                balance += order.order_total
+
             }
         }
     }
