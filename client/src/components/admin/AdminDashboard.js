@@ -49,10 +49,10 @@ export default function AdminDashboard({ state }) {
             .catch(err => console.log(err))
     }, [state])
     return (
-        <div className="user__dashboard__main text-center">
+        <div className="admin__dashboard__main text-center">
             <h3 className="py-3">Admin Dashboard</h3>
             <div className="d-flex flex-wrap justify-content-around pt-4">
-                <div className="d-flex  flex-wrap justify-content-around">
+                
                     <div className="dashboard__item card animate__animated  animate__bounceIn">
                         <h3>Users</h3>
                         <h1 className="display-4  mt-4 text-danger">{stats.numberOfUsers}</h1>
@@ -85,7 +85,7 @@ export default function AdminDashboard({ state }) {
                         <h3>Spent : $<span className="text-danger">{stats.highestSpenderTotal}</span></h3>
 
                     </div>
-                </div>
+              
             </div>
         </div>
     )

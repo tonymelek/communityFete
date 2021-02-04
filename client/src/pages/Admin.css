@@ -10,3 +10,7 @@
 .admin__users{
     max-width: 350px;
 }
+.admin__dashboard__main{
+    height: 80vh;
+    overflow-y: scroll;
+}
