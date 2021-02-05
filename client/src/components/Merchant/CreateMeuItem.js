@@ -24,6 +24,7 @@ export default function CreateMenuItem({ values }) {
                 setTimeout(() => {
                     dispatch({ type: 'notifier', display: { class: 'd-none', color: '', text: '' } })
                 }, 2000);
+                values.setCreate_appear('d-none')
             })
             .catch(err => {
                 dispatch({ type: 'notifier', display: { class: 'd-block', color: 'bg-danger', text: `Error creating new Item` } })
