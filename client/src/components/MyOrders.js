@@ -24,6 +24,7 @@ export default function MyOrders() {
         })
 
         socket.on('activeOrders', data => {
+            setSeparators([...new Set(data.map(item => item.order_status !== 'received' ? item.order_custom_id : null).filter(el => el !== null))])
             setMyOrders(data)
         })
         socket.emit('newOrder', myOrders)

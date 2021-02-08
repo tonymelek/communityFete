@@ -12,6 +12,7 @@ const { sequelize } = require('../models');
 //Create new Shop
 router.post('/create-shop', verifyToken, async (req, res) => {
     const { authData } = req;
+   
     if (authData.role !== "admin") {
         res.status(403).send("You are not authorized to create a shop")
     }
@@ -23,6 +24,7 @@ router.post('/create-shop', verifyToken, async (req, res) => {
 //Create First Admin Only without a token
 router.post('/create-first-admin', async (req, res) => {
     try {
+        console.log(req.headers['x-forwarded-for']);
         const users = await db.User.findAll();
         const hashedPass = await bcrypt.hash(req.body.password, 10)
         if (users.length === 0 && req.body.role === "admin") {
