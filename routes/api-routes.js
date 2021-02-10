@@ -7,12 +7,15 @@ const { jwtSign } = require('./../middleware/jwt')
 const verifyToken = require('../middleware/verifyToken');
 const isStrong = require('../middleware/checkpassstrength');
 const { sequelize } = require('../models');
-
-
+const multer = require('multer')
+const path = require('path');
+const fs = require('fs');
+const tinify = require("tinify");
+tinify.key = process.env.tinify
 //Create new Shop
 router.post('/create-shop', verifyToken, async (req, res) => {
     const { authData } = req;
-   
+
     if (authData.role !== "admin") {
         res.status(403).send("You are not authorized to create a shop")
     }
@@ -114,12 +117,32 @@ router.get('/get-this', verifyToken, async (req, res) => {
         throw new Error(err)
     }
 })
+const storage = multer.diskStorage({
+    destination: function (req, file, callback) {
+        const temp_path = path.join('__dirname', '../tempUploads');
+        console.log(temp_path);
+        fs.readdirSync(temp_path).forEach(file => {
+            console.log(file);
+            fs.unlinkSync(path.join(temp_path, file))
+        })
+        callback(null, './tempUploads');
+    },
+    filename: function (req, file, callback) {
+        callback(null, file.originalname);
+    }
+});
 
+const upload = multer({ storage: storage }).single('userPhoto');
 //Create Menu Item
-router.post('/create-menu-item', verifyToken, async (req, res) => {
+router.post('/create-menu-item', verifyToken, upload, async (req, res) => {
+    console.log(req.body.data);
+    console.log(req.file);
+
     try {
         const { token, authData } = req;
-        const { item_name, item_desc, item_pic, unit, serve, price } = req.body;
+        let { item_name, item_desc, unit, serve, price } = JSON.parse(req.body.data);
+        price = parseInt(price)
+        console.log(item_name, item_desc, unit, serve, price);
         //use authData to let only merchant at the ShopId can add items
         const user = await db.User.findOne({
             where:
@@ -128,12 +151,32 @@ router.post('/create-menu-item', verifyToken, async (req, res) => {
                 role: "merchant",
             }
         })
+        console.log(user.dataValues);
         if (!user.dataValues) {
             return res.status(403).send("You are not authorized")
         }
+
+        const source = tinify.fromFile(`./tempUploads/${req.file.originalname}`);
+        const resized = source.resize({
+            method: "fit",
+            width: 150,
+            height: 150
+        });
+        console.log('Resized', resized);
+        let item_pic = path.join(__dirname, '../client/public', 'menu', `${req.file.originalname}`)
+        console.log(item_pic);
+        resized.toFile(item_pic);
+        item_pic = `./menu/${req.file.originalname}`
+        console.log(item_name, item_desc, item_pic, unit, serve, price, user.dataValues.ShopId);
         db.Menu.create({ item_name, item_desc, item_pic, unit, serve, price, ShopId: user.dataValues.ShopId })
-            .then(data => res.status(200).send("Item created successfully"))
-            .catch(err => { res.status(403).send("Creation failed", err) })
+            .then(data => {
+                console.log(data);
+                res.send('data added');
+            })
+            .catch(err => {
+                console.log(err);
+                res.send("Creation failed", err)
+            })
 
     }
     catch (err) {
