@@ -11,13 +11,13 @@ module.exports = function (sequelize, DataTypes) {
         item_pic: {
             type: DataTypes.STRING,
             allowNull: false,
-            validate: {
-                isOnGoogleDrive(value) {
-                    if (!(/https:\/\/drive.google.com\/(.)+/g).test(value)) {
-                        throw new Error('Picture is not Stored on Google Drive')
-                    }
-                }
-            }
+            // validate: {
+            //     isOnGoogleDrive(value) {
+            //         if (!(/https:\/\/drive.google.com\/(.)+/g).test(value)) {
+            //             throw new Error('Picture is not Stored on Google Drive')
+            //         }
+            //     }
+            // }
         },
         unit: {
             type: DataTypes.STRING,
