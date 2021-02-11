@@ -164,7 +164,9 @@ router.post('/create-menu-item', verifyToken, upload, async (req, res) => {
         });
         console.log('Resized', resized);
         let item_pic = path.join(__dirname, '../client/public', 'menu', `${req.file.originalname}`)
-        console.log(item_pic);
+        if (process.env.NODE_ENV === "production") {
+            item_pic = path.join(__dirname, '../client/build', 'menu', `${req.file.originalname}`)
+        }
         resized.toFile(item_pic);
         item_pic = `./menu/${req.file.originalname}`
         console.log(item_name, item_desc, item_pic, unit, serve, price, user.dataValues.ShopId);
