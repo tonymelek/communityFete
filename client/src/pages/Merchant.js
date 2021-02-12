@@ -21,7 +21,7 @@ export default function Merchant() {
     const history = useHistory();
     const [menu, setMenu] = useState([])
     const [oldOrders, setOldOrders] = useState([])
-    let stopExec = false
+
     useEffect(() => {
         let tempToken = localStorage.getItem("conmmFete")
         if (tempToken === null) {
@@ -29,38 +29,33 @@ export default function Merchant() {
             return
         }
         API.getThisUser(tempToken).then(res => {
+            if (res.data.role !== "" && res.data.role !== "merchant") {
+                history.replace(`/${res.data.role}`)
+            }
+
+            const socket = socketIOClient();
+            API.getMenu(res.data.token)
+                .then(res => {
+                    setMenu(res.data)
+                })
+                .catch(err => console.log(err.response))
+            socket.emit("userId", res.data.email)
+            socket.on('shopConnection', data => {
+                console.log(data);
+            })
+            socket.on('shopOrders', data => {
+                setOldOrders(data)
+            })
             dispatch({ type: 'update_token', token: res.data.token })
             dispatch({ type: 'update_balance', balance: res.data.balance })
             dispatch({ type: 'update_role', role: res.data.role })
             dispatch({ type: 'update_email', email: res.data.email })
+            return () => socket.disconnect();
         })
             .catch(err => console.warn(err))
 
     }, [])
-    useEffect(() => {
-        if (state.role !== "" && state.role !== "merchant") {
-            history.replace(`/${state.role}`)
-        }
-        if (state.token === "" || stopExec) {
-            return
-        }
-        stopExec = true
-        const socket = socketIOClient();
-        API.getMenu(state.token)
-            .then(res => {
-                setMenu(res.data)
-            })
-            .catch(err => console.log(err.response))
-        socket.emit("userId", state.user_email)
-        socket.on('shopConnection', data => {
-            console.log(data);
-        })
-        socket.on('oldOrders', data => {
-            setOldOrders(data)
-        })
 
-        return () => socket.disconnect();
-    }, [state])
 
 
 
@@ -78,7 +73,7 @@ export default function Merchant() {
                     <SideMenu side={{ side, setSide }} items={sideMenu} />
                     <div className=" mx-2 merchant__section mb-10" id="Dashboard">
 
-                        <MerchantDashboard orders={oldOrders} menu={menu} state={state} />
+                        <MerchantDashboard orders={oldOrders} state={state} menu={menu} />
 
                     </div>
                     <div className=" mx-2 merchant__section mb-10" id="Manage-Orders">
@@ -95,7 +90,7 @@ export default function Merchant() {
                     </div>
 
                 </div>
-                <MerchantFooter orders={oldOrders} />
+                <MerchantFooter orders={oldOrders} state={state} />
             </div>
         </div>
     )

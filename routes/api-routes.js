@@ -27,7 +27,7 @@ router.post('/create-shop', verifyToken, async (req, res) => {
 //Create First Admin Only without a token
 router.post('/create-first-admin', async (req, res) => {
     try {
-        console.log(req.headers['x-forwarded-for']);
+
         const users = await db.User.findAll();
         const hashedPass = await bcrypt.hash(req.body.password, 10)
         if (users.length === 0 && req.body.role === "admin") {
@@ -120,9 +120,9 @@ router.get('/get-this', verifyToken, async (req, res) => {
 const storage = multer.diskStorage({
     destination: function (req, file, callback) {
         const temp_path = path.join('__dirname', '../tempUploads');
-        console.log(temp_path);
+
         fs.readdirSync(temp_path).forEach(file => {
-            console.log(file);
+
             fs.unlinkSync(path.join(temp_path, file))
         })
         callback(null, './tempUploads');
@@ -135,14 +135,13 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage }).single('userPhoto');
 //Create Menu Item
 router.post('/create-menu-item', verifyToken, upload, async (req, res) => {
-    console.log(req.body.data);
-    console.log(req.file);
+
 
     try {
         const { token, authData } = req;
         let { item_name, item_desc, unit, serve, price } = JSON.parse(req.body.data);
         price = parseInt(price)
-        console.log(item_name, item_desc, unit, serve, price);
+
         //use authData to let only merchant at the ShopId can add items
         const user = await db.User.findOne({
             where:
@@ -151,7 +150,7 @@ router.post('/create-menu-item', verifyToken, upload, async (req, res) => {
                 role: "merchant",
             }
         })
-        console.log(user.dataValues);
+
         if (!user.dataValues) {
             return res.status(403).send("You are not authorized")
         }
@@ -162,21 +161,21 @@ router.post('/create-menu-item', verifyToken, upload, async (req, res) => {
             width: 150,
             height: 150
         });
-        console.log('Resized', resized);
+
         let item_pic = path.join(__dirname, '../client/public', 'menu', `${req.file.originalname}`)
         if (process.env.NODE_ENV === "production") {
             item_pic = path.join(__dirname, '../client/build', 'menu', `${req.file.originalname}`)
         }
         resized.toFile(item_pic);
         item_pic = `./menu/${req.file.originalname}`
-        console.log(item_name, item_desc, item_pic, unit, serve, price, user.dataValues.ShopId);
+
         db.Menu.create({ item_name, item_desc, item_pic, unit, serve, price, ShopId: user.dataValues.ShopId })
             .then(data => {
-                console.log(data);
+
                 res.send('data added');
             })
             .catch(err => {
-                console.log(err);
+
                 res.send("Creation failed", err)
             })
 
@@ -364,11 +363,11 @@ router.post('/processpayment', verifyToken, async (req, res) => {
         response.transaction = transaction.dataValues;
         const orders = JSON.parse(body.orders);
         const subTotal = body.subTotal
-        console.log('orders', orders);
+
         for (shop in orders) {
-            console.log('shop', shop);
+
             for (item of orders[shop]) {
-                console.log(item);
+
                 const tempOrder = await db.Order.create(
                     {
                         order_custom_id: `${transaction.dataValues.id}${shop}`
@@ -379,7 +378,7 @@ router.post('/processpayment', verifyToken, async (req, res) => {
                         UserId: user.dataValues.id,
                         TransactionId: transaction.dataValues.id
                     })
-                console.log(tempOrder.dataValues);
+
                 response[shop] = tempOrder.dataValues;
                 response[shop]["total"] = subTotal[shop];
             }
@@ -393,7 +392,7 @@ router.post('/processpayment', verifyToken, async (req, res) => {
                     where: { id: parseInt(shop) }
                 })
         }
-        console.log(response);
+
         res.status(200).json(response)
     }
     catch (err) {
@@ -405,9 +404,23 @@ router.post('/processpayment', verifyToken, async (req, res) => {
 router.get('/merchants/:email', async (req, res) => {
     try {
         const user = await db.User.findOne({ where: { email: req.params.email } })
+        const bestSeller = await db.Order.findAll({
+            attributes: [[sequelize.fn('count', sequelize.col('MenuId')), 'item_count'], 'MenuId'],
+            group: ['MenuId'],
+            where: { ShopId: user.dataValues.ShopId },
+            order: sequelize.literal('item_count DESC'),
+            include: [{ model: db.Menu, attributes: ['item_name'] }],
+            limit: 1
+
+        })
+        const totalOrders = await db.Order.findAll({
+            attributes: [[sequelize.fn('count', sequelize.col('order_total')), 'item_count'], 'TransactionId', 'order_total'],
+            group: ['TransactionId'],
+            where: { ShopId: user.dataValues.ShopId },
+        })
         const merchantsCount = await db.User.count({ where: { ShopId: user.dataValues.ShopId } })
-        console.log(req.params.email, merchantsCount);
-        res.json({ merchantsCount })
+
+        res.json({ merchantsCount, bestSeller, totalOrders: totalOrders.length })
     }
     catch (err) {
         throw new Error(err)
@@ -418,7 +431,7 @@ router.get('/merchants/:email', async (req, res) => {
 router.get('/admin-stats', verifyToken, async (req, res) => {
     try {
         const { authData, token } = req
-        console.log(token);
+
         if (authData.role !== "admin") {
             return res.status(403).send("Sorry you are not authorized to access this information")
         }
@@ -430,7 +443,7 @@ router.get('/admin-stats', verifyToken, async (req, res) => {
             where: { amount: { [db.Sequelize.Op.gt]: 0 } },
             attributes: [[sequelize.fn('sum', sequelize.col('amount')), 'total']]
         })
-        console.log(totalSpend);
+
         const highestSpender = await db.Transaction.findAll({
             where: { amount: { [db.Sequelize.Op.gt]: 0 } },
             attributes: ['UserId', [sequelize.fn('sum', sequelize.col('amount')), 'total']],
@@ -494,6 +507,62 @@ router.get('/test2', async (req, res) => {
 
     } catch (error) {
         throw error
+    }
+})
+
+//User Statistics
+router.get('/user-stats', verifyToken, async (req, res) => {
+    try {
+        const { authData, token } = req
+
+        if (authData.role !== "user") {
+            return res.status(403).send("Sorry you are not authorized to access this information")
+        }
+        const user = await db.User.findOne({ where: { email: authData.email } })
+        const id = user.dataValues.id
+        const favourite = await db.Order.findAll({
+            attributes: [[sequelize.fn('count', sequelize.col('MenuId')), 'item_count'], 'MenuId'],
+            group: ['MenuId'],
+            where: { UserId: id },
+            order: sequelize.literal('item_count DESC'),
+            include: [{ model: db.Menu, attributes: ['item_name'] }],
+            limit: 1
+
+        })
+        const spent = await db.Transaction.findAll({
+            attributes: [[sequelize.fn('sum', sequelize.col('amount')), 'spent']],
+            where: { UserId: id },
+        })
+        const totalOrders = await db.Transaction.count({
+            where: { UserId: id }
+        })
+
+        res.json({ favourite: favourite[0], spent: spent[0], totalOrders })
+
+    } catch (error) {
+        res.status(500).send('Error')
+    }
+})
+
+
+
+router.get('/merchant-footer', verifyToken, async (req, res) => {
+    try {
+        const { authData, token } = req
+        if (authData.role !== "merchant") {
+            return res.status(403).send("Sorry you are not authorized to access this information")
+        }
+        const user = await db.User.findOne({ where: { email: authData.email } })
+        const shopInfo = await db.Shop.findOne({
+            attributes: ['balance', 'name'],
+            where: { id: user.dataValues.ShopId }
+        })
+
+
+        res.json(shopInfo)
+
+    } catch (error) {
+        res.status(500).send('Error')
     }
 })
 

@@ -131,7 +131,7 @@ export default {
             }
         })
     },
-    getMerchantsPerShop(email) {
+    getMerchantStats(email) {
         return axios({
             method: 'get',
             url: `/api/merchants/${email}`
@@ -154,7 +154,25 @@ export default {
                 authorization: `bearer ${token}`
             }
         })
-    }
+    },
+    getUserStats(token) {
+        return axios({
+            method: 'get',
+            url: '/api/user-stats',
+            headers: {
+                authorization: `bearer ${token}`
+            }
+        })
+    },
+    getMerchantFooter(token) {
+        return axios({
+            method: 'get',
+            url: '/api/merchant-footer',
+            headers: {
+                authorization: `bearer ${token}`
+            }
+        })
+    },
 
 
 }

@@ -15,7 +15,7 @@ export default function App() {
 
 
 
-  const initialState = { token: '', user_email: '', basket: {}, role: '', orderTotal: 0, balance: 0, refreshAPI: true, display: { class: 'd-none', color: '', text: '' } };
+  const initialState = { token: '', user_email: '', basket: {}, role: '', orderTotal: 0, balance: 0, display: { class: 'd-none', color: '', text: '' } };
   const [state, dispatch] = useReducer((state, action) => {
     switch (action.type) {
       case "update_token":
@@ -28,8 +28,6 @@ export default function App() {
         return { ...state, user_email: action.email }
       case "update_orderTotal":
         return { ...state, orderTotal: action.orderTotal }
-      case "refreshAPI":
-        return { ...state, refreshAPI: action.refreshAPI }
       case "updateBasket":
         return { ...state, basket: action.basket }
       case "notifier":

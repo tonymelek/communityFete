@@ -35,7 +35,6 @@ db.sequelize.sync().then(() => {
     console.log(`New Connection Established ${socket.id}`);
     socket.on('updateOrderStatus', async data => { //Listen to order updates from merchants
       try {
-        console.log(data);
         const ordersToUpdate = await db.Order.findAll({ where: { order_custom_id: data.id } })
 
         for (let order of ordersToUpdate) {
@@ -48,7 +47,7 @@ db.sequelize.sync().then(() => {
           .findAll({
             where: {
               UserId: updatedOrder.dataValues.UserId
-              // , order_status: ['paid', 'ready'] 
+              , order_status: ['paid', 'ready']
             }
             ,
             include: [{ model: db.Shop, attributes: ['name'] },
@@ -60,14 +59,14 @@ db.sequelize.sync().then(() => {
         io.to(users[updatedOrder.dataValues.UserId]).emit('activeOrders', activeOrders);
         const shopOrders = await db.Order
           .findAll({
-            where: { ShopId: updatedOrder.dataValues.ShopId }
+            where: { ShopId: updatedOrder.dataValues.ShopId, order_status: ['paid', 'ready'] }
             ,
             include: [{ model: db.Shop, attributes: ['name', 'balance'] },
             { model: db.User, attributes: ['email'] },
             { model: db.Menu, attributes: ['item_name', 'price'] }
             ]
           })
-        io.to(updatedOrder.dataValues.ShopId.toString()).emit('oldOrders', shopOrders)
+        io.to(updatedOrder.dataValues.ShopId.toString()).emit('shopOrders', shopOrders)
       }
 
       catch (err) {
@@ -80,24 +79,26 @@ db.sequelize.sync().then(() => {
     socket.on("userId", async data => {
       if (data !== undefined) {
         const user = await db.User.findOne({ where: { email: data } })
+        console.log(data, socket.id);
         if (user.dataValues.ShopId !== null) {
           let ShopId = user.dataValues.ShopId.toString()
           socket.join(ShopId) //Add all merchants of same shop to a achat root to send them updates and orders of this shop
           io.to(ShopId).emit('shopConnection', `You are now connected as Shop-${ShopId}`)
+
           const orders = await db.Order
             .findAll(
               {
                 where:
                 {
                   ShopId: user.dataValues.ShopId
-                  // ,order_status: ['paid', 'ready']
+                  , order_status: ['paid', 'ready']
                 }
                 ,
                 include: [{ model: db.User, attributes: ['email'] },
                 { model: db.Shop, attributes: ['name', 'balance'] },
                 { model: db.Menu, attributes: ['item_name', 'price'] }]
               })
-          io.to(ShopId).emit('oldOrders', orders)
+          io.to(ShopId).emit('shopOrders', orders)
         } else {
           users[user.dataValues.id] = socket.id //record user ID and socket to send them orders updates
           const user_orders = await db.Order
@@ -106,7 +107,7 @@ db.sequelize.sync().then(() => {
                 where:
                 {
                   UserId: user.dataValues.id
-                  // , order_status: ['paid', 'ready']
+                  , order_status: ['paid', 'ready']
                 }
                 ,
                 include: [{ model: db.User, attributes: ['email'] },
@@ -122,7 +123,6 @@ db.sequelize.sync().then(() => {
 
     //Handle new orders from users
     socket.on('newOrder', async data => {
-
       for (key in data) {
         if (key !== 'transaction') {
           const user_orders = await db.Order
@@ -131,7 +131,7 @@ db.sequelize.sync().then(() => {
                 where:
                 {
                   ShopId: parseInt(key)
-                  // ,order_status: ['paid', 'ready']
+                  , order_status: ['paid', 'ready']
                 }
                 ,
                 include: [{ model: db.User, attributes: ['email'] },
@@ -139,7 +139,7 @@ db.sequelize.sync().then(() => {
                 { model: db.Menu, attributes: ['item_name', 'price'] }
                 ]
               })
-          io.to(key).emit('oldOrders', user_orders) //send order to shop room chat as they come in from user
+          io.to(key).emit('shopOrders', user_orders) //send order to shop room chat as they come in from user
         }
       }
 
