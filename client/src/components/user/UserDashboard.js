@@ -45,7 +45,7 @@ export default function UserDashboard({ orders, state }) {
                 <div className="d-flex  flex-grow-1 justify-content-around">
                     <div className="dashboard__item card animate__animated  animate__bounceIn cursor-pointer" onClick={() => history.push('/order-tracker')}>
                         <h3>Active Orders</h3>
-                        <h1 className="display-4  mt-4 text-primary">{orders.length}</h1>
+                        <h1 className="display-4  mt-4 text-primary">{[...new Set(orders.map(order => order.order_custom_id))].length}</h1>
                     </div>
                     <div className="dashboard__item card animate__animated  animate__bounceIn">
                         <h3>Total Spent</h3>

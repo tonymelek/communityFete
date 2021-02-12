@@ -34,7 +34,7 @@ export default function MerchantFooter({ orders, state }) {
                 </div>
                 <div className="d-flex flex-column align-items-center">
                     <CgTimer className="GrDocumentTime " />
-                    <p className="p-0 my-0 mx-2">Active : <strong> {orders.length}</strong> </p>
+                    <p className="p-0 my-0 mx-2">Active : <strong> {[...new Set(orders.map(order => order.order_custom_id))].length}</strong> </p>
                 </div>
                 <div className="d-flex flex-column align-items-center">
                     <AiOutlineDollar className="AiOutlineDollar" />
