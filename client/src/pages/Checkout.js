@@ -12,16 +12,24 @@ import Notifier from '../components/Notifier';
 export default function Checkout() {
     const { dispatch, state } = useContext(AppContext);
     const [myOrders, setMyOrders] = useState([])
-    let stopExec = false
     const history = useHistory();
 
     useEffect(() => {
-        let tempToken = localStorage.getItem("conmmFete")
+        let tempToken = null;
+        if (localStorage.getItem("conmmFete")) {
+            tempToken = localStorage.getItem("conmmFete")
+        }
+
         if (tempToken === null) {
             history.replace(`/`)
             return
         }
+        const socket = socketIOClient();
+        socket.emit("userId", state.user_email)
         API.getThisUser(tempToken).then(res => {
+            if (res.data.role !== 'user') {
+                return history.replace(`/${res.data.role}`)
+            }
             dispatch({ type: 'update_token', token: res.data.token })
             dispatch({ type: 'update_balance', balance: res.data.balance })
             dispatch({ type: 'update_role', role: res.data.role })
@@ -30,20 +38,6 @@ export default function Checkout() {
         })
             .catch(err => console.warn(err))
 
-    }, [])
-
-    useEffect(() => {
-        if (state.user_email === "" || stopExec) {
-            return
-        }
-        if (state.role !== "" && state.role !== "user") {
-            history.replace(`/${state.role}`)
-        }
-        stopExec = true
-        const socket = socketIOClient();
-
-
-        socket.emit("userId", state.user_email)
         socket.on('userOrders', data => {
             setMyOrders(data)
         })
@@ -51,11 +45,13 @@ export default function Checkout() {
         socket.on('activeOrders', data => {
             setMyOrders(data)
         })
-        socket.emit('newOrder', myOrders)
+
         return () => {
             socket.disconnect()
         }
-    }, [state])
+    }, [])
+
+
 
     return (
         <div className="container user__main">
@@ -65,7 +61,7 @@ export default function Checkout() {
                 <UserHeader state={state} />
                 <div className="flex__main__components">
                     <div className="pt-2 px-2 user__revise">
-                        <ResviseItems props={{ state, dispatch, history, socketIOClient }} />
+                        <ResviseItems props={{ state, dispatch, history }} />
 
                     </div>
                     <div id="Order-now" className="pt-4">

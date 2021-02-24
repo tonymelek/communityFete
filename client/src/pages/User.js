@@ -53,7 +53,7 @@ export default function User() {
             socket.on('activeOrders', data => {
                 setMyOrders(data)
             })
-            socket.emit('newOrder', myOrders)
+
 
             dispatch({ type: 'update_token', token: res.data.token })
             dispatch({ type: 'update_balance', balance: res.data.balance })

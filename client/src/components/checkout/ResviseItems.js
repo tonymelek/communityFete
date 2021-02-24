@@ -1,17 +1,19 @@
 import React, { useEffect, useState } from 'react'
 import API from '../../utils/API';
 import './ReviseItems.css'
-
+import socketIOClient from "socket.io-client";
 
 export default function ResviseItems({ props }) {
-    const { state, dispatch, history, socketIOClient } = props
+    const { state, dispatch, history } = props
     const [basket, setBasket] = useState([]);
     const [order, setOrder] = useState({});
     const [subTotal, setSubTotal] = useState({});
+    const [sockets, setSockets] = useState({})
     const t_basket = [];
     const t_order = {}
     const t_subTotal = {}
     useEffect(() => {
+
         for (let item in state.basket) {
             t_basket.push(state.basket[item])
             let tempItem = { ...state.basket[item] }
@@ -26,13 +28,21 @@ export default function ResviseItems({ props }) {
         setBasket(t_basket)
         setOrder(t_order)
         setSubTotal(t_subTotal)
+
     }, [state])
 
-
+    useEffect(() => {
+        const socket = socketIOClient();
+        setSockets(socket)
+        return () => {
+            socket.disconnect()
+        }
+    }, [])
 
 
     const handleSetOrders = (e) => {
         e.preventDefault();
+
         if (state.orderTotal === 0) {
             dispatch({ type: 'notifier', display: { class: 'd-block', color: 'bg-danger', text: 'Total should not be zero, you will be redirected to main page' } })
             setTimeout(() => {
@@ -40,7 +50,7 @@ export default function ResviseItems({ props }) {
             }, 2000);
             return history.replace('/user')
         }
-        const socket = socketIOClient()
+
         if (state.balance >= state.orderTotal) {
             //call api to store transaction , update user balance , create orders in the database
             API.processPayment(
@@ -51,18 +61,18 @@ export default function ResviseItems({ props }) {
                 },
                 state.token)
                 .then(res => {
-                    console.log(res.data)
-                    socket.emit('newOrder', res.data)
-                    socket.disconnect();
+                    console.log(res.data);
+                    sockets.emit('newOrder', res.data)
+                    dispatch({ type: 'notifier', display: { class: 'd-block', color: 'bg-success', text: 'Order Processed Successfully' } })
+                    dispatch({ type: 'updateBasket', basket: {} })
+
                 })
                 .catch(err => console.log(err.response))
-
-            dispatch({ type: 'notifier', display: { class: 'd-block', color: 'bg-success', text: 'Order Processed Successfully' } })
             setTimeout(() => {
                 dispatch({ type: 'notifier', display: { class: 'd-none', color: '', text: '' } })
                 history.replace('/order-tracker')
             }, 2000);
-            dispatch({ type: 'updateBasket', basket: {} })
+
 
 
         } else {

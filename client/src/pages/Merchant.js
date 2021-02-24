@@ -21,6 +21,7 @@ export default function Merchant() {
     const history = useHistory();
     const [menu, setMenu] = useState([])
     const [oldOrders, setOldOrders] = useState([])
+    const [sockets, setSockets] = useState({})
 
     useEffect(() => {
         let tempToken = localStorage.getItem("conmmFete")
@@ -34,6 +35,7 @@ export default function Merchant() {
             }
 
             const socket = socketIOClient();
+            setSockets(socket)
             API.getMenu(res.data.token)
                 .then(res => {
                     setMenu(res.data)
@@ -78,7 +80,7 @@ export default function Merchant() {
                     </div>
                     <div className=" mx-2 merchant__section mb-10" id="Manage-Orders">
 
-                        <ManageOrders myOrders={oldOrders} menu={menu} />
+                        <ManageOrders myOrders={oldOrders} socket={sockets} />
 
                     </div>
 

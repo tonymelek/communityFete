@@ -79,12 +79,11 @@ db.sequelize.sync().then(() => {
     socket.on("userId", async data => {
       if (data !== undefined) {
         const user = await db.User.findOne({ where: { email: data } })
-        console.log(data, socket.id);
         if (user.dataValues.ShopId !== null) {
           let ShopId = user.dataValues.ShopId.toString()
-          socket.join(ShopId) //Add all merchants of same shop to a achat root to send them updates and orders of this shop
+          socket.join(ShopId) //Add all merchants of same shop to a chat room to send them updates and orders of this shop
           io.to(ShopId).emit('shopConnection', `You are now connected as Shop-${ShopId}`)
-
+          console.log(socket.id, ShopId);
           const orders = await db.Order
             .findAll(
               {
@@ -114,6 +113,7 @@ db.sequelize.sync().then(() => {
                 { model: db.Shop, attributes: ['name'] }
                   , { model: db.Menu, attributes: ['item_name', 'price'] }]
               })
+
           io.to(users[user.dataValues.id]).emit('userOrders', user_orders)
 
         }
@@ -123,6 +123,7 @@ db.sequelize.sync().then(() => {
 
     //Handle new orders from users
     socket.on('newOrder', async data => {
+      console.log(users)
       for (key in data) {
         if (key !== 'transaction') {
           const user_orders = await db.Order
@@ -144,6 +145,9 @@ db.sequelize.sync().then(() => {
       }
 
     })
+
+
+
   })
 
 });

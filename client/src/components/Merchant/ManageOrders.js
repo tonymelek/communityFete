@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import socketIOClient from "socket.io-client";
 import Loading from '../common/Loading';
 
-export default function ManageOrders({ myOrders, menu }) {
+export default function ManageOrders({ myOrders, socket }) {
     const [loading, setLoading] = useState(false)
     const separators = [...new Set(myOrders.map(item => item.order_status !== 'received' ? item.order_custom_id : null).filter(el => el !== null))]
     useEffect(() => {
@@ -12,13 +12,11 @@ export default function ManageOrders({ myOrders, menu }) {
     const updateOrderStatus = (e, order_id, status) => {
         e.preventDefault();
         setLoading(true)
-        const socket = socketIOClient();
+
         socket.emit('updateOrderStatus', {
             id: order_id,
             status
         })
-        setTimeout(() => socket.close(), 3000)
-
     }
     return (
         <div className="merchant__manage__orders__main">
