@@ -65,13 +65,14 @@ export default function ResviseItems({ props }) {
                     sockets.emit('newOrder', res.data)
                     dispatch({ type: 'notifier', display: { class: 'd-block', color: 'bg-success', text: 'Order Processed Successfully' } })
                     dispatch({ type: 'updateBasket', basket: {} })
+                    setTimeout(() => {
+                        dispatch({ type: 'notifier', display: { class: 'd-none', color: '', text: '' } })
+                        history.replace('/order-tracker')
+                    }, 2000);
 
                 })
                 .catch(err => console.log(err.response))
-            setTimeout(() => {
-                dispatch({ type: 'notifier', display: { class: 'd-none', color: '', text: '' } })
-                history.replace('/order-tracker')
-            }, 2000);
+
 
 
 

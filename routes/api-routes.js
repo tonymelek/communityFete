@@ -128,7 +128,8 @@ const storage = multer.diskStorage({
         callback(null, './tempUploads');
     },
     filename: function (req, file, callback) {
-        callback(null, file.originalname);
+        console.log(file.originalname.trim().replace(/\s/g, "_"))
+        callback(null, file.originalname.trim().replace(/\s/g, "_"));
     }
 });
 
@@ -155,19 +156,19 @@ router.post('/create-menu-item', verifyToken, upload, async (req, res) => {
             return res.status(403).send("You are not authorized")
         }
 
-        const source = tinify.fromFile(`./tempUploads/${req.file.originalname}`);
+        const source = tinify.fromFile(`./tempUploads/${req.file.originalname.trim().replace(/\s/g, "_")}`);
         const resized = source.resize({
             method: "fit",
             width: 150,
             height: 150
         });
 
-        let item_pic = path.join(__dirname, '../client/public', 'menu', `${req.file.originalname}`)
+        let item_pic = path.join(__dirname, '../client/public', 'menu', `${req.file.originalname.trim().replace(/\s/g, "_")}`)
         if (process.env.NODE_ENV === "production") {
-            item_pic = path.join(__dirname, '../client/build', 'menu', `${req.file.originalname}`)
+            item_pic = path.join(__dirname, '../client/build', 'menu', `${req.file.originalname.trim().replace(/\s/g, "_")}`)
         }
         resized.toFile(item_pic);
-        item_pic = `./menu/${req.file.originalname}`
+        item_pic = `./menu/${req.file.originalname.trim().replace(/\s/g, "_")}`
 
         db.Menu.create({ item_name, item_desc, item_pic, unit, serve, price, ShopId: user.dataValues.ShopId })
             .then(data => {

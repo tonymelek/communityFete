@@ -4,7 +4,12 @@ import Loading from '../common/Loading';
 import './MerchantDashboard.css'
 export default function MerchantDashboard({ orders, menu, state }) {
 
-    const [stats, setStats] = useState({})
+    const [stats, setStats] = useState({
+        total: 0,
+        bestSeller: '',
+        bestCount: 0,
+        merchantsCount: 0
+    })
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
@@ -23,7 +28,11 @@ export default function MerchantDashboard({ orders, menu, state }) {
                 setLoading(false);
 
             })
-            .catch(err => console.log(err))
+            .catch(err => {
+                console.log(err)
+                setLoading(false);
+            }
+            )
     }, [orders])
 
 
